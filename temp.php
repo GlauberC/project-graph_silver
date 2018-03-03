@@ -254,7 +254,6 @@
                 
             }  
         }
-
     }
     function dragged(d) {
         d.fx = d3.event.x;
