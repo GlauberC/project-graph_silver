@@ -5,6 +5,15 @@ This repository create a forced direct graph from maude file called SiLVer# proj
 
 Version history:
 
+
+ v 3.1
+    It was created index.php and explore.php
+    The temp.php was moved to explore.php
+    It was applied bootstrap on nav that was found on link: https://bootsnipp.com/snippets/featured/inline-navbar-search
+    It was created a text box in index.html and it was possible send strings to explore.php, but It doesn't have function yet.
+    The width of graph is now 100% of screen.   
+
+
  v 2.1
     Fixed issue with the created nodes that contains ];
     Fixed issue with repeat targets in lists;
