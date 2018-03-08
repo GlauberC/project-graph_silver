@@ -7,14 +7,14 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script>
+
+            
         $(document).ready(function(){
             $("input#submitHide").hide();
             $("li#explore").click(function(){
-                $("input#submitHide").click()
+                $("input#submitHide").click();
             })
         });
-
-        
     </script>
 
 </head>
@@ -78,10 +78,10 @@
         </nav>
     
         <div class="container">
-            <form action="explore.php" method="post">
+            <form action="create_graph.php" method="get">
                 <div class="form-group">
-                    <label for="txt-box-graph">New Graph:</label>
-                    <textarea class="form-control" rows="5" name="txt-box-graph"></textarea>
+                    <label for="graph">New Graph:</label>
+                    <textarea class="form-control" rows="5" name="graph"></textarea>
                     <input id="submitHide" type="submit" value="test">
                 </div>
             </form>

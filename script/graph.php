@@ -13,8 +13,6 @@
 <svg width="960" height="600"></svg>
 
 <script type="text/javascript">
-    var test = <?php echo json_encode($_POST['txt-box-graph']); ?>;
-    alert("foi escrito: " + test);
     var colors = d3.scaleOrdinal(d3.schemeCategory10);
     var svg = d3.select("svg"),
         width = +svg.attr("width"),
@@ -39,7 +37,6 @@
         .force("charge", d3.forceManyBody())
         .force("center", d3.forceCenter(width / 2, height / 2));
     <?php
-        //$COMMAND = json_encode($_POST['txt-box-graph']);
         $COMMAND = "red generateDot('a \ 'b . { 'A } | 'c \ 'd .  { 'B}  , ('A =d= 'x \ 'y . { 'A} , 'B =d= 'w \ 'w . 't \ 't . { 'B} )) .";
         //$COMMAND = "red generateDot(['d_0, 'd_1, 'u_0_L, 'u_0_R, 'u_1_L, 'u_1_R]{'P_1} | ({'F_1} | ({'P_0} | {'F_0}))  , ('F_0 =d= tau \ 'u_0_R . tau \ 'd_0 . {'F_0} + 'u_0_L \ tau . 'd_0 \ tau . {'F_0}, 'F_1 =d= tau \ 'u_1_R . tau \ 'd_1 . {'F_1} + 'u_1_L \ tau . 'd_1 \ tau . {'F_1}, 'P_0 =d= tau \ 'think_0 . {'P_0} + 'u_0_R \ 'u_1_L . {'eat_0}, 'P_1 =d= tau \ 'think_1 . {'P_1} + 'u_1_R \ 'u_0_L . {'eat_1}, 'eat_0 =d= tau \ 'eat_0 . {'release_0}, 'eat_1 =d= tau \ 'eat_1 . {'release_1}, 'release_0 =d= 'd_0 \ 'd_1 . {'P_0}, 'release_1 =d= 'd_1 \ 'd_0 . {'P_1})) .";
         $DIR_MAUDE = "/usr/bin/maude";
