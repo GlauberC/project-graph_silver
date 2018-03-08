@@ -4,7 +4,8 @@ This repository create a forced direct graph from maude file called SiLVer# proj
 
 
 Version history:
- v3.x
+
+ v 3.x
 
     v 3.11  
         It was created create_graph.php  
@@ -16,7 +17,7 @@ Version history:
         It was created a text box in index.html and it was possible send strings to explore.php, but It doesn't have function yet.  
         The width of graph is now 100% of screen.   
 
-v2.x  
+v 2.x  
 
     v 2.1
         Fixed issue with the created nodes that contains ];
