@@ -4,13 +4,15 @@ This repository create a forced direct graph from maude file called SiLVer# proj
 
 
 Version history:
- v 4.x
-    4.1.2
-        It was created three sizes to show graph(>1100px, >600 and <=600)
-        It was separated script from index.php to script/graph.js
-        It was reduced the size of table
 
-    4.1
+ v 4.x
+
+    4.1.2  
+        It was created three sizes to show graph(>1100px, >600 and <=600)  
+        It was separated script from index.php to script/graph.js  
+        It was reduced the size of table  
+        It was created callMaude.sh to future updates  
+    4.1  
         It was apllied ajax;  
         Now the create_graph.php is calling maude.silver.run and is returning the file name and graph container;  
         Now the menu refers to the index.php itself;  
