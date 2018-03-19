@@ -1,8 +1,11 @@
 <?php
     $COMMAND = $_GET["txt"];
-    //$COMMAND = "red generateDot('a \ 'b . { 'A } | 'c \ 'd .  { 'B}  , ('A =d= 'x \ 'y . { 'A} , 'B =d= 'w \ 'w . 't \ 't . { 'B} )) .";
-    //$COMMAND = "red generateDot('a \ 'b . 0 , empty) .";
-
+    
+/*
+    // Test of Script
+    echo passthru("./callMaude.sh $COMMAND");
+*/  
+    
     $DIR_MAUDE = "/usr/bin/maude";
     $DIR_FILE_MAUDE = "/home/glauberca/Documentos/Silver/semantics.maude";
     $MODF = "-no-banner";
@@ -13,7 +16,7 @@
     
     </div>
     <div id='info-node-link' class='container-full'>
-        <h2> <small>Node:  <strong><span id='node'></small></span></strong><h2><br/><br/>
+        <h2> <small id='node'>Node:  <strong><span id='node'></small></span></strong><h2>
         <table class='table table-striped table-condensed'>
             <thead>
                 <tr>
@@ -39,14 +42,16 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <style type="text/css">
-        svg{
-            display: block;
-            width: 100%;
-            align: center;
-        }
+
         .link {stroke: rgba(0, 0, 0, .8); stroke-opacity: .4; stroke-width: 0.8px;} 
         div#info-node-link{
             margin: 2em;
+        }
+        small#node{
+            font-size: .6em
+        }
+        td{
+            font-size: .8em
         }
     </style>    
 
