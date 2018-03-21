@@ -7,8 +7,11 @@ Version history:
 
  v 4.x
 
+
+    4.1.3  
+        Some adjustments on graph's physics  
     4.1.2  
-        It was created three sizes to show graph(>1100px, >600 and <=600)  
+        It was created three sizes to show graph based on width window(>1100px, >600 and <=600)  
         It was separated script from index.php to script/graph.js  
         It was reduced the size of table  
         It was created callMaude.sh to future updates  
