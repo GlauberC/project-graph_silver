@@ -7,17 +7,17 @@ Version history:
 
  v 4.x
 
-
+    4.2  
+        Added click function to create a highlight on node.    
     4.1.3  
-        Some adjustments on graph's physics    
-        Added border on graph  
-        It was increased size of link's line  
-
+        Some adjustments on graph's physics;    
+        Added border on graph;  
+        It was increased size of link's line;  
     4.1.2  
-        It was created three sizes to show graph based on width window(>1100px, >600 and <=600)  
-        It was separated script from index.php to script/graph.js  
-        It was reduced the size of table  
-        It was created callMaude.sh to future updates  
+        It was created three sizes to show graph based on width window(>1100px, >600 and <=600);  
+        It was separated script from index.php to script/graph.js;  
+        It was reduced the size of table;  
+        It was created callMaude.sh to future updates;  
     4.1  
         It was apllied ajax;  
         Now the create_graph.php is calling maude.silver.run and is returning the file name and graph container;  
