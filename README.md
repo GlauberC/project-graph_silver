@@ -9,7 +9,10 @@ Version history:
 
 
     4.1.3  
-        Some adjustments on graph's physics  
+        Some adjustments on graph's physics    
+        Added border on graph  
+        It was increased size of link's line  
+
     4.1.2  
         It was created three sizes to show graph based on width window(>1100px, >600 and <=600)  
         It was separated script from index.php to script/graph.js  

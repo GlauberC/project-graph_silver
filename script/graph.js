@@ -37,7 +37,7 @@ function graph() {
     widthSize = [300, 400, 800];
     heightSize = [200, 200, 300];
     nodeRadius = [8, 10, 12];
-    MarkrefX = [18, 23, 29 ];
+    MarkrefX = [17, 20, 22 ];
     console.log(window.innerWidth);
     function windowSizeCalculation(width){
         if (width > 1100){
@@ -67,8 +67,8 @@ function graph() {
             'refX': MarkrefX[winSize],
             'refY': 0,
             'orient': 'auto',
-            'markerWidth': 8,
-            'markerHeight': 8,
+            'markerWidth': 7,
+            'markerHeight': 7,
             'xoverflow': 'visible'
         })
         .append('svg:path')
@@ -76,12 +76,10 @@ function graph() {
         .attr('fill', 'rgba(0, 0, 0, .8)')
         .style('stroke', 'none');
     var simulation = d3.forceSimulation()
-        .force("link", d3.forceLink().link(links))
-        .force("forceX").strength(d)
-        .force("forceY").strength(d)
-        .force("charge", d3.forceManyBody())
+        .force("link", d3.forceLink().id(function (d) {return d.id;}).distance(100).strength(0.5))
+        .force("charge", d3.forceManyBody().strength(-50)) 
         .force("center", d3.forceCenter(width / 2, height / 2))
-        .force("collision",d3.forceCollide().radius(function(d){return 1;}));
+        .force("collision",d3.forceCollide().radius(function(d){return 20;}));
     d3.json($fileName, function (error, graph) {
         if (error) throw error;
         update(graph.links, graph.nodes);
@@ -121,7 +119,7 @@ function graph() {
             .attrs({
                 'class': 'edgelabel',
                 'id': function (d, i) { return 'edgelabel' + i },
-                'font-size': 10,
+                'font-size': 11,
                 'fill': 'rgba(175, 175, 174, 0.9)'
 
 

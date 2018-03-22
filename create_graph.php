@@ -43,7 +43,7 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <style type="text/css">
 
-        .link {stroke: rgba(0, 0, 0, .8); stroke-opacity: .4; stroke-width: 0.8px;} 
+        .link {stroke: rgba(0, 0, 0, .8); stroke-opacity: .4; stroke-width: 1.2px;}
         div#info-node-link{
             margin: 2em;
         }
@@ -52,6 +52,9 @@
         }
         td{
             font-size: .8em
+        }
+        svg{
+            box-shadow: 1px 1px 1px 2px rgba(222,222,222,0.2);
         }
     </style>    
 
