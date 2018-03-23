@@ -1,0 +1,331 @@
+*** =========================================
+*** SYMBOLIC SEMANTICS
+*** =========================================
+
+------------------------------------------------------------------
+--- This file defines the following modules:
+
+--- ACT-PROCESS (sort ActProcess) is a term of the form <L,P> where P
+--- is a process and L is a configuration. ActProcess terms are used to
+--- denote the labelled transition of a process P with label L .
+---
+--- SYM-SEMANTICS defines the one-step transition relation. The term
+--- step( P @ D) reduces to a configuration <L, Q>. Here, P and Q are
+--- processes, D is a set of process definitions and L a configuration
+--- ,i.e., a label. 
+---
+--- SUC-STATE uses the META-LEVEL machinery to compute steps of the
+--- symbolic semantics.
+---
+--- SIG-GRAPH builds the label transition graph given an initial
+--- process.
+
+--- BISIMULATION procedures for checking bisimulation of CNA processes. 
+---
+--- GRAPH-2-DOT generates a DOT file with the labelled transition
+--- system.
+---
+--- See the file examples.maude for some examples of use.
+------------------------------------------------------------------
+load configuration .
+
+fmod ACT-PROCESS is
+    pr SYM-CONFIGURATION .
+    ------------------------------------
+    *** Action - Process terms
+    ------------------------------------
+    sort ActProcess .
+    op <_,_> : SConf Process -> ActProcess [prec 90 format(d b o r o d)] .
+    op error : -> ActProcess .
+
+    op getProcess : ActProcess -> Process .
+    eq getProcess(< C:SConf , P:Process >) = P:Process .
+
+    op getLabel : ActProcess -> SConf .
+    eq getLabel(< C:SConf , P:Process >) = C:SConf .
+    
+endfm
+    
+view SConf from TRIV to SYM-CONFIGURATION is
+    sort Elt to SConf .
+endv
+
+view ActProcess from TRIV to ACT-PROCESS is
+    sort Elt to ActProcess .
+endv
+
+fmod SET-ACTPROC is
+    protecting SET{ActProcess} * (sort Set{ActProcess} to SActProcess, sort NeSet{ActProcess} to NESActProcess) .
+endfm
+    
+---------------------------------
+*** Symbolic Rules 
+---------------------------------
+mod SYM-SEMANTICS is
+    protecting ACT-PROCESS .
+    op step : CtxProc -> ActProcess .
+    op step : Process SDefinition -> ActProcess .
+    eq step(P:Process , D:SDefinition) = step(P:Process @ D:SDefinition) .
+
+    *** ============================
+    *** RULES
+    *** ============================
+
+    *** ------------------
+    var D : SDefinition .
+    vars P Q P' Q' : Process .
+    vars sl sl' : SLink .
+    vars C C' C'' : SConf .
+    var S : SetName .
+    var PN : Qid .
+    *** ------------------
+    
+    
+    rl [act] : step(sl . P @ D) => < sl ,  P > .
+
+    crl [par1] : step(P | Q @ D) => < C , P' | Q > if step(P @ D) => < C , P' > . 
+    crl [par2] : step(P | Q @ D) => < C , P | Q' > if step(Q @ D) => < C , Q' > .
+
+    crl [sum1] : step(P + Q @ D) => < C , P' > if  step(P @ D) => < C , P' > .
+    crl [sum2] : step(P + Q @ D) => < C , Q' > if  step(Q @ D) => < C , Q' > .
+
+    crl [com] : step(P | Q @ D) => < C , P' | Q' > if step(P @ D) => < C' ,P' > /\ step(Q @ D) => < C'', Q' > /\ C := merge(C' , C'')  /\ isValid?(C) .
+    
+    crl [nu] : step([S] P @ D) => < [S] C , [S] P' >  if step(P @ D) => < C , P' >  /\ isValid?([S] C) .
+
+    crl [call] : step({ PN } @ D) => < C , P > if step(getProc(PN, D) @ D) => < C , P > .
+endm
+
+---------------------------------
+*** Building traces from a process
+---------------------------------
+mod SYM-TRACE is
+    protecting SYM-SEMANTICS .
+    protecting LIST{SConf} * (op __ to _->_ , op nil to end , sort List{SConf} to Trace  ) . 
+
+    sort TraceConf .
+    op <_,_,_> : Process Trace SDefinition -> TraceConf . *** unbounded length
+    op <_,_,_,_> : Process Trace SDefinition Nat -> TraceConf . *** bounded length
+
+    op trace : Process SDefinition -> TraceConf .
+    op trace : Process SDefinition Nat -> TraceConf .
+    
+    ---------------------------
+    vars P P' : Process .
+    var D : SDefinition .
+    var T : Trace .
+    var C : SConf .
+    var n : Nat .
+    ---------------------------
+
+    eq trace(P, D) = < P, end , D > .
+    eq trace(P, D, n) = < P, end , D  , n > .
+    
+    crl [next-step] : < P , T , D > => < P' , ( T -> C) , D > if step(P @ D) => < C , P' > .
+    crl [next-step] : < P , T , D, s n > => < P' , ( T -> C) , D, n > if step(P @ D) => < C , P' > .
+endm
+
+---------------------------------
+*** Defining transitions in the LTS
+---------------------------------
+fmod TRANSITION is
+    protecting SYM-CONFIGURATION .
+    sort Transition .
+    op {_,_,_} : Process SConf Process -> Transition [ctor] .
+endfm
+
+view Transition from TRIV to TRANSITION is
+    sort Elt to Transition .
+endv
+
+fmod SET-TRANSITION is
+    protecting SET{Transition} * ( sort Set{Transition} to STransition , sort NeSet{Transition} to NESTransition ) .
+    protecting LIST-PROC .
+endfm
+
+----------------------------
+*** Computing sucessor states
+----------------------------
+mod SUC-STATE is
+    protecting META-LEVEL * (op empty to emptyML , op _\_ to _\M\_ , op _,_ to _C_ , op insert to insert' , op delete to delete', op _in_ to _in'_, op |_| to ||_||, op $card to $card', op union to union' , op intersection to intersection' , op $intersect to $intersect', op $diff to $diff', op _subset_ to _subset'_ , op _psubset_ to _psubset'_ ) .
+    protecting SYM-SEMANTICS .
+    protecting SET-ACTPROC .
+
+    -----------------------
+    var D : SDefinition .
+    var N : Nat .
+    var C : SConf .
+    var P  : Process .
+    var SAP : SActProcess .
+    -----------------------
+    
+    op nextState : CtxProc Nat -> SActProcess .
+    eq nextState(P @ D, N) = downTerm(getTerm(metaSearch(upModule('SUC-STATE, false), upTerm(step(P @ D) ), 'NS:ActProcess, nil,  '+, unbounded, N)), (error).ActProcess) .
+    op nextStateRec : CtxProc Nat -> SActProcess .
+    ceq nextStateRec(P @ D, N) = (if SAP == error then empty else (SAP , nextStateRec(P @ D , N + 1)) fi) if SAP := nextState(P @ D , N) .
+
+    op nextState : CtxProc -> SActProcess .
+    eq nextState(P @ D) = nextStateRec(P @ D , 0 ) .
+
+    op nextState : Process SDefinition -> SActProcess .
+    eq nextState(P , D) = nextState(P @ D) .
+endm
+
+----------------------------------
+*** Building the transition system
+----------------------------------
+mod SIG-GRAPH is
+    protecting SUC-STATE .
+    protecting SET-TRANSITION * ( op _\_ : STransition STransition -> STransition to _\T\_ ) .
+    protecting LIST-PROC .
+    sort GState . *** Graph State
+    op <_,_,_,_> : SProcess LProcess STransition SDefinition -> GState [ctor] .
+    op error : -> GState [ctor] .
+
+    ------------------------------
+    var D : SDefinition .
+    var ST : STransition .
+    vars P Q : Process .
+    vars SP : SProcess .
+    var LP : LProcess .
+    var C : SConf .
+    vars SAP NewStates : SActProcess .
+    ------------------------------
+
+    op getProcesses : GState -> SProcess .
+    eq getProcesses((error).GState) = empty .
+    eq getProcesses(< SP , LP , ST , D > ) = SP .
+
+    op getTransitions : GState -> STransition .
+    eq getTransitions( error ) = empty .
+    eq getTransitions( < SP , LP , ST , D > ) = ST .
+    
+    op initGraph : Process Definition -> GState .
+    eq initGraph(P, D) = < empty , P , empty , D > .
+
+    op getProcesses : SActProcess -> LProcess .
+    eq getProcesses(empty) = nil .
+    eq getProcesses( (< C , P > , SAP) ) = P getProcesses(SAP) .
+
+    op toTransitions : Process SActProcess -> STransition .
+    eq toTransitions(P , empty) = empty .
+    eq toTransitions(P, ( < C , Q >  , SAP) ) = { P , C , Q } , toTransitions(P, SAP) .
+
+    --- Generate the graph (using the meta-level)
+    op generateGraph : Process Definition -> GState .
+    eq generateGraph(P, D) =  downTerm(getTerm(metaRewrite(upModule('SIG-GRAPH, false), upTerm(initGraph(P , D) ), unbounded)), (error).GState) .
+    
+
+    crl [one-step] : < SP, (P LP), ST, D > => < (SP, P), (LP getProcesses(NewStates)), (ST, toTransitions(P, NewStates)), D > if (not (P in SP) ) /\ NewStates := nextState(P, D) .
+    crl [one-step'] : < SP, (P LP), ST, D > => < (SP), LP, ST, D > if P in SP . *** already visited state
+
+endm
+
+*** Naive Implementation of Bisimulation equality
+mod BISIMULATION is
+    pr PAIR-PROC .
+    pr SIG-GRAPH .
+    pr SET-PAIR-PROC .
+    --- States with the transition systems + the pairs of the bisimulation
+    sort BState .
+    op bs : STransition SPairProc -> BState [ctor] .
+    
+    --------------------
+    vars S T : SProcess .
+    vars P Q P' Q' R R' : Process .
+    vars D D' : SDefinition .
+    vars G1 G2 G3 : GState .
+    var LTS : STransition .
+    vars C C' : SConf .
+    var SPs : SPairProc .
+    --------------------
+    
+    op _x_ : SProcess SProcess -> SPairProc .
+    op combine : Process SProcess -> SPairProc .
+    eq empty x T = empty .
+    eq ( (P, S) x T) = combine(P, T),  (S x T) .
+    eq combine(P, empty) = empty .
+    eq combine(P, (Q, T)) = p(P, Q) , combine(P, T) .
+
+    --- All the pairs
+    op fullRelation : Process SDefinition Process SDefinition -> BState .
+    ceq fullRelation(P, D, Q , D') = bs( (getTransitions(G1), getTransitions(G2)), S x S) if G1 := generateGraph(P, D) /\ G2 := generateGraph(Q, D') /\ S := (getProcesses(G1), getProcesses(G2)) .
+
+      --- Check whether Q can match a C move in a LTS
+    op match? : STransition Process SConf SPairProc Process -> Bool .
+    eq match?(empty, Q, C, SPs, P) = false .
+    eq match?(({ R , C' , R' } , LTS), Q, C, SPs, P') = if (R == Q and wtie(C', C) and p(R', P') in SPs ) then true else match?(LTS, Q, C, SPs, P') fi .
+    
+    crl [drop] : bs(( { P , C , P' },  LTS) ,  ( p(P, Q), SPs)) => bs(( { P , C , P' },  LTS) ,  SPs)  if P =/= Q /\ not (match?(LTS, Q, C,  ( p(P, Q), SPs), P')) .
+
+      --- Computing the largest bisimulation
+    op getBisimulation-aux :  Process SDefinition Process SDefinition -> BState .
+    eq getBisimulation-aux(P, D, Q , D') = downTerm(getTerm(metaRewrite(upModule('BISIMULATION, false), upTerm(fullRelation(P , D , Q , D') ), unbounded)), bs(empty, empty)) .
+    op getBisimulation :  Process SDefinition Process SDefinition -> SPairProc .
+    ceq getBisimulation(P, D, Q , D') = SPs if bs(LTS, SPs) := getBisimulation-aux(P, D, Q , D') .
+    op getBisimulation :  Process Process SDefinition -> SPairProc .
+    ceq getBisimulation(P, Q , D) = SPs if bs(LTS, SPs) := getBisimulation-aux(P, D, Q , D) .
+    op getBisimulation :  Process Process -> SPairProc .
+    ceq getBisimulation(P, Q) = SPs if bs(LTS, SPs) := getBisimulation-aux(P, empty, Q , empty) .
+    
+    op bisimilar? : Process SDefinition Process SDefinition -> Bool .
+    ceq bisimilar?(P, D, Q , D') = (P x Q) in SPs if SPs := getBisimulation(P, D, Q, D') .
+    --- Using the same set of processes definitions
+    op bisimilar? : Process Process SDefinition -> Bool .
+    ceq bisimilar?(P, Q , D) = (P x Q) in SPs if SPs := getBisimulation(P, Q, D) .
+    op bisimilar? : Process Process -> Bool .
+    ceq bisimilar?(P, Q) = (P x Q) in SPs if SPs := getBisimulation(P, Q, empty) .
+      
+    
+endm
+
+----------------------------------
+*** Translating the transition system
+*** into a DOT file
+----------------------------------
+mod GRAPH-2-DOT is
+    protecting SIG-GRAPH .
+    sort mapPN . *** Map from Processes to Natural numbers (needed to name the states)
+    sort mapPNItem .
+    subsort mapPNItem < mapPN .
+    op empty : -> mapPN [ctor] .
+    op data : Process Nat -> mapPNItem[ctor] .
+    op _,_ : mapPN mapPN -> mapPN [ctor comm assoc id: empty] .
+
+    ----------------------
+    vars P Q : Process .
+    var map : mapPN .
+    var n : Nat .
+    var C : SConf .
+    var D : SDefinition .
+    var ST : STransition .
+    ----------------------
+
+    op toTable : SProcess Nat -> mapPNItem .
+    op toTable : GState -> mapPNItem .
+    eq toTable(empty, n) = empty .
+    eq toTable( (P, S:SProcess) , n) = data(P, n) , toTable(S:SProcess, s(n)) .
+    eq toTable(G:GState) = toTable(getProcesses(G:GState), 0) .
+
+    op toString : mapPN -> String .
+    eq toString((empty).mapPN) = "" .
+    eq toString( ( data( P, n), map) ) = "S" + string(n ,10) + " [label = " + char(34) +  toString(P) +  char(34) + "]; " + toString(map) .
+
+    op getState : mapPN Process -> String .
+    eq getState( (data(P, n), map) , P) = "S" + string(n , 10) .
+    
+    op translate : STransition mapPN  -> String .
+    eq translate(empty, map) = "" .
+    eq translate( ( { P , C , Q } , ST  ) , map) = getState(map, P) + " -> " + getState(map, Q) + " [label = " + char(34)  + toString(C) +  char(34) + "];" + translate(ST , map) .
+
+    op toDot : GState -> String .
+    eq toDot(error) = "error" .
+    ceq toDot(G:GState) = "digraph graphname {" +
+	  " rankdir=LR; " + toString(map) + translate(getTransitions(G:GState) , map )
+	+ "}"
+      if map := toTable(G:GState) .
+
+    op generateDot : Process SDefinition -> String .
+    eq generateDot(P, D) = toDot(generateGraph(P, D)) .
+
+endm

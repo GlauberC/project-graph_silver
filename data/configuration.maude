@@ -1,0 +1,215 @@
+*** =========================================
+*** SYMBOLIC CONFIGURATIONS
+*** =========================================
+------------------------------------------------------------------------
+--- Symbolic configurations can be:
+--- - Non-empty multisets of solid links separated by ";"
+--- - A configuration preceded by [S] where S is set of 
+---    names (the restricted names of the configuration .
+
+--- A configuratiom L is valid if:
+--- 1) tau appears at most once as an input
+--- 2) tau appears at most once as an output
+--- Moreover, [S]{L} is valid if:
+--- 1) L is valid 
+--- 2) The names in S come in complementary input/outpus. 
+--- 3) All the names form a unique connected component 
+------------------------------------------------------------------------
+load processes .
+------------------------------------
+*** Symbolic Configurations 
+------------------------------------
+
+fmod SYM-CONFIGURATION is
+    protecting PROC-CTX .
+    
+    sort SConf . *** multiset of links (with possibly restricted names)
+    *** Multiset of solid links
+    sort MSLink . *** multiset of links
+    subsort SLink < MSLink < SConf .
+
+    op error : -> SConf [ctor] . *** invalid configurations
+    op _;_ : MSLink MSLink -> MSLink [ctor assoc comm] . *** multiset union
+    op [_]_ : SetName SConf -> SConf [ctor prec 80] . *** restriction
+
+    -----------------------------
+    vars sn sn' : SName .
+    vars n n' n'' : Name .
+    vars sl sl' : SLink .
+    vars S S' : SetName .
+    vars C C' : SConf .
+    vars MS MS' : MSLink .
+    var nat : Nat .
+    -----------------------------
+
+    op toString : SConf -> String .
+    eq toString(sl) = toString(sl) .
+    eq toString(sl ; MS) = toString(sl) + "," + toString(MS) .
+    eq toString([S]  MS) = "[" + toString(S) + "] " + toString(MS) .
+
+    --- The base case is handled in the links module
+    op in : SName MSLink -> Bool .
+    eq in(sn , sl ; MS) = in(sn, sl) or in(sn, MS) .
+    op isIn? : SName MSLink -> Bool .
+    eq isIn?(sn , sl ; MS) = isIn?(sn, sl) or isIn?(sn, MS) .
+    op isOut? : SName MSLink -> Bool .
+    eq isOut?(sn , sl ; MS) = isOut?(sn, sl) or isOut?(sn, MS) .
+    
+    --- Cannonical form with restricted names on the front
+    eq [S] [S'] C = [S, S'] C . *** vx . vx L == vx L due to idempotency of Set{Name}
+
+    *** Simplifying local names
+    ceq [sn , S] MS = [S] MS if not in(sn, MS) .
+    eq [empty] MS = MS .
+
+      --- FreeNames in a configuration
+    op freeNames : SConf -> SetName .
+    eq freeNames(error) = empty .
+    eq freeNames(sl ; MS) = freeNames(sl) , freeNames(MS) .
+    eq freeNames([S] MS) = freeNames(MS) \\ S .
+    
+    --- Replacing a local name 'a into new('a, 1) or new('a, 2)
+    op toNew : SetName Nat -> SetName . *** 1 for left and 2 for right
+    eq toNew(empty , nat) = empty .
+    eq toNew(n, nat) = new(n, nat) .
+    eq toNew((n , S), nat) = new(n, nat) , toNew(S, nat) .
+
+    --- Renaming
+    op rename : SetName MSLink Nat -> MSLink .
+    eq rename(empty , MS , nat) = MS .
+    ceq rename( (n, S) , MS, nat) = rename( S, MS, nat) if not in (n, MS) .
+    eq rename( (n, S) , MS, nat) = rename(S, subsMS(MS , n , new(n, nat)), nat) [owise] .
+    
+    --- Subsitutions
+    op subsMS : MSLink SName SName -> MSLink .
+    eq subsMS( sl  , sn , sn') = subs(sl, sn, sn') .
+    eq subsMS( sl ; MS , sn , sn') = subs(sl, sn, sn') ; subsMS(MS, sn, sn') .
+
+    --- Merging configurations
+    *** toNew and rename facilities implement a (simplified version of) alpha conversion
+    *** needed to avoid variable capturing.
+    *** 1 is used for left and 2 for right
+    op merge : SConf SConf -> SConf .
+    eq merge(C, error) = error .
+    eq merge(error, C) = error .
+    eq merge(MS , MS') = MS ; MS' . *** just multiset union
+    eq merge([S] MS , MS') = [toNew(S, 1)] rename(S, MS, 1) ; MS' .
+    eq merge(MS' , [S] MS) = [toNew(S, 2)] rename(S, MS, 2) ; MS' .
+    eq merge([S] MS , [S'] MS') = [toNew(S, 1) , toNew(S', 2)] rename(S, MS, 1) ; rename(S', MS', 2) .
+
+    --- Auxiliar functions for checking validity of configurations
+    op numInputs : Name SConf -> Nat .
+    eq numInputs(n, error) = 0 .
+    eq numInputs(n, sl ) = if isIn?(n, sl) then 1 else 0 fi  .
+    eq numInputs(n, sl ; MS) = numInputs(n, sl) + numInputs(n, MS) .
+    
+    *** Always counting, regardless restriced names.
+    *** This may count names in unnecessary cases, but, for implementing "balance" it is ok.
+    eq numInputs(n, [S]  MS) = numInputs(n, MS) . 
+
+    op numOutputs : Name SConf -> Nat .
+    eq numOutputs(n, error) = 0 .
+    eq numOutputs(n, sl ) = if isOut?(n, sl) then 1 else 0 fi  .
+    eq numOutputs(n, sl ; MS) = numOutputs(n, sl) + numOutputs(n, MS) .
+    eq numOutputs(n, [S]  MS) = numOutputs(n, MS) . 
+
+    *** Restricted names appear the same number of times as input / output 
+    op balanced : SetName SConf -> Bool . *** [memo] .
+    eq balanced(empty, C) = true .
+    eq balanced(n, MS) = numInputs(n, MS) == numOutputs(n, MS) .
+    eq balanced(n, [S] MS) = balanced(n, MS) .
+    eq balanced((n, S) , C) = balanced(n, C) and balanced(S , C) .
+
+    op tauSingle? : MSLink -> Bool .
+    eq tauSingle?(tau \ tau ; MS) = false .
+    eq tauSingle?(tau \ sn ; tau \ sn') = false .
+    eq tauSingle?(tau \ sn ; tau \ sn' ; MS) = false .
+    eq tauSingle?(sn \ tau ; sn' \ tau) = false .
+    eq tauSingle?(sn \ tau ; sn' \ tau ; MS) = false .
+    eq tauSingle?(MS) = true [owise] .
+
+    
+    *** Computing the strong components of the graph
+    op nextVertices : SetName SetName MSLink -> Bool .
+    eq nextVertices(S, S', n \ sn) = (n in S ) or ((S \\ S') =/= empty and not (n in S')) .
+    eq nextVertices(S, S', sl) = false [owise] .
+    ceq nextVertices(S, S', n \ n' ; MS) = nextVertices((S , n'), S', MS) if ( (n in S) or ((S \\ S') =/= empty and not (n in S') ))  .
+    ceq nextVertices(S, S', n \ tau ; MS) = nextVertices((S), S', MS) if ( (n in S) or ((S \\ S') =/= empty and not (n in S') )) .
+    eq nextVertices(S, S' , sl ; MS) = false [owise] .
+    *** The configuration is assumed to have restricted names and more than one
+    *** link (otherwise isValid? returns false without calling this function)
+    op checkVertices : SConf -> Bool .
+    eq checkVertices([S] tau \ sn ; MS) = nextVertices(sn , S , MS) .
+    ceq checkVertices([S] n \ sn ; MS) = nextVertices(sn , S , MS) if not isIn?(tau, MS) .
+
+    op isValid? : SConf -> Bool .
+    eq isValid?(error) = false .
+    eq isValid?(MS) = tauSingle?(MS) .
+    eq isValid?([S] MS) = tauSingle?(MS) and (freeNames([S] MS)  =/= empty or (isIn?(tau, MS) and isOut?(tau, MS)) ) and balanced(S, MS) and checkVertices([S] MS) .
+    
+    
+    -------------------------------------
+    *** Checking WTIE relation
+    -------------------------------------
+    --- We define possible empty multiset of solid links
+    sort MultisetL .
+    subsort SLink < MultisetL .
+    op empty : -> MultisetL [ctor] .
+    op _,_ : MultisetL MultisetL -> MultisetL [ctor assoc comm id: empty] .
+    op toMultisetL : MSLink ->  MultisetL .
+    eq toMultisetL(sl) = sl .
+    eq toMultisetL(sl ; MS) = sl , toMultisetL(MS) .
+
+    *** eliminates x/x from the configuration if x is a private name
+    op simplify1 : SConf -> SConf . 
+    *** eq simplify1 (epsilon) = epsilon .
+    eq simplify1 (error) = error .
+    eq simplify1 ([sn , S] MS ; sn \ sn) = simplify1([sn , S] MS) .
+    eq simplify1 (C) = C [owise] .
+
+    *** eliminates x/y from the configuration if x,y are private names
+    op simplify2 : SConf -> SConf . 
+    eq simplify2 (error) = error .
+    eq simplify2 ([sn , sn' , S] MS ; sn \ sn') = simplify1([sn , sn' , S] subsMS(MS , sn, sn')) .
+    eq simplify2 (C) = C [owise] .
+
+    op simplify : SConf -> SConf .
+    eq simplify(C) = simplify1(simplify2(C)) .
+
+    *** Assuming that the configuration are simplified,
+    *** all links are of the form a \ b where a nor b are restricted
+    *** or of the form a \ x or x \ a where x is restricted
+    *** Next definition computes all the possible pairs a \ b (capabilities) that
+    *** can be built without restricted names
+    op getNonLocalLinks : SetName  MultisetL -> MultisetL .
+    eq getNonLocalLinks(S, sl) =  if isLocal?(S, sl) then empty else sl fi  .
+    eq getNonLocalLinks(S, (sl , MS:MultisetL)) =  getNonLocalLinks(S, sl) , getNonLocalLinks(S, MS:MultisetL) .
+
+    --- Links where input is a local name
+    op localInput : SetName MultisetL -> MultisetL .
+    eq localInput(S, sl) = if isLocalIn?(S, sl) then sl else empty fi  .
+    eq localInput(S, (sl , MS:MultisetL)) = localInput(S, sl) , localInput(S, MS:MultisetL) .
+    --- Links where output is a local name
+    op localOutput : SetName MultisetL -> MultisetL .
+    eq localOutput(S, sl) = if isLocalOut?(S, sl) then sl else empty fi  .
+    eq localOutput(S, (sl , MS:MultisetL)) = localOutput(S, sl) , localOutput(S, MS:MultisetL) .
+
+    --- From inputs to outputs (through a local name )
+    op combine : MultisetL MultisetL -> MultisetL .
+    eq combine(empty, MS:MultisetL) = empty .
+    eq combine(MS:MultisetL, empty) = empty .
+    eq combine( x:Name \ a:SName , b:SName \ y:Name) = if x:Name == y:Name then b:SName \ a:SName else empty fi .
+    eq combine( (sl , MS:MultisetL) , sl') = combine(sl , sl') , combine(MS:MultisetL , sl') .
+    eq combine( sl , (sl' , MS:MultisetL)) = combine(sl , sl') , combine(sl , MS:MultisetL) .
+    eq combine( (sl , MS:MultisetL) , (sl' , MS':MultisetL)) = combine(sl , sl') , combine(sl , MS':MultisetL) , combine(MS:MultisetL , (sl' , MS':MultisetL)) .
+    
+    op capability : SConf -> MultisetL .
+    eq capability(error) = empty .
+    eq capability(MS) = toMultisetL(MS) .
+    eq capability([S] MS ) = if simplify([S] MS) == ([S] MS) then
+	  getNonLocalLinks(S, toMultisetL(MS)) , combine(localInput(S, toMultisetL(MS)) , localOutput(S, toMultisetL(MS))) else capability(simplify([S] MS)) fi .
+
+    --- Definition of wtie using capabilities
+    op wtie : SConf SConf -> Bool .
+    eq wtie (C, C')  = capability(C) == capability(C') and freeNames(C) == freeNames(C') .
+endfm

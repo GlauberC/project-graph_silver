@@ -1,0 +1,93 @@
+*** =========================================
+*** SLML Logic and Model Checking
+*** =========================================
+-------------------------------------------------------------------------
+--- This module defines the syntax and semantics of SLML (Symbolic Link
+--- Modal Logic). The propositions of this logic (inhabitant of sort Prop
+--- in the module SATISFACTION of Maude) are used as assertions for the
+--- model checker.
+--- SMLM formulas are: tt (true), ff (false), AND (conjunction),
+--- OR(disjunction), [[ C ]] F (box modality) and << C >> F (diamond modality) 
+--- LTL formulas of Maude's model checker include [] (always), <> (eventually)
+-------------------------------------------------------------------------
+
+load model-checker .
+load semantics .
+
+-----------------------------------------------------
+--- Symbolic Link Modal Logic Formulas and Semantics
+-----------------------------------------------------
+mod SLML is
+    protecting SUC-STATE .
+    including SATISFACTION .
+    protecting NAT .
+
+    vars P P' : Process .
+    var D : SDefinition .
+    var N : Nat .
+    vars C C' : SConf .
+    var SAP : SActProcess .
+    vars F G : Prop .
+
+    sort st .
+    op st : CtxProc -> st [ctor] .
+    *** Transition relation. 
+    crl [nx] : st(P @ D)  => st(P' @ D)    if step(P @ D) => < C , P' > .
+    
+    subsort st < State .
+    --- ANY denotes any condiguration.
+    --- Wtie is extended accordingly 
+    op ANY : -> SConf [ctor] . *** Any configuration
+    op wtieany : SConf SConf -> Bool .
+    eq wtieany (C, ANY) = true .
+    eq wtieany( ANY, C) = true .
+    eq wtieany(C, C') = wtie(C, C') [owise] .
+    
+    *** Semantics of formulas
+    ops tt : -> Prop [ctor] .
+    eq st(P @ D) |= tt = true .
+    ops ff : -> Prop [ctor] .
+    eq st(P @ D) |= ff = false .
+    
+    ops _AND_ : Prop Prop -> Prop [ctor] .
+    eq st(P @ D) |= F AND G  = (st(P @ D) |= F) and (st(P @ D) |= G) .
+    ops _OR_ : Prop Prop -> Prop [ctor] .
+    eq st(P @ D) |= F OR G  = (st(P @ D) |= F) or (st(P @ D) |= G) .
+
+    op _MD_ : SConf Prop -> Prop [ctor] .
+    eq st(P @ D) |= (C MD F) = bigor( nextState(P @ D) , D, C , F ) .
+    op bigor : SActProcess SDefinition SConf Prop  -> Bool .
+    eq bigor(empty , D , C , F) = false .
+    eq bigor( ( < C' , P >, SAP), D , C , F) = ( wtieany(C , C')  and-then ( st(P @ D) |= F)) or-else bigor(SAP , D , C , F) .
+
+    op _MB_ : SConf Prop -> Prop [ctor] .
+    eq st(P @ D) |= (C MB F) = bigand( nextState(P @ D) , D, C , F ) .
+    op bigand : SActProcess SDefinition SConf Prop  -> Bool .
+    eq bigand(empty , D , C , F) = true .
+    eq bigand( ( < C' , P >, SAP), D , C , F) = ( (not wtieany(C , C'))  or-else ( st(P @ D) |= F)) and-then bigand(SAP , D , C , F) .
+
+    --- Notation for modalities
+    op <<_>>_ : SConf Prop -> Prop [ctor] .
+    eq << C >> F = C MD F .
+    op [[_]]_ : SConf Prop -> Prop [ctor] .
+    eq [[ C ]] F = C MB F .
+    
+endm
+
+*** =====================
+--- Model Checker
+*** =====================
+mod SLML_MC is
+    including SLML .
+    including MODEL-CHECKER .
+    including LTL-SIMPLIFIER . 
+    var P : Process .
+    var F : Formula .
+    var D : SDefinition .
+    op modelCheck : Process Formula -> ModelCheckResult .
+    op modelCheck : Process SDefinition Formula -> ModelCheckResult .
+    op modelCheck : CtxProc Formula -> ModelCheckResult .
+    eq modelCheck(P, F) = modelCheck(st( P @ empty) , F) .
+    eq modelCheck(P , D , F) = modelCheck(st( P @ D) , F) .
+    eq modelCheck(P @ D , F) = modelCheck(st( P @ D) , F) .
+endm

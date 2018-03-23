@@ -1,0 +1,219 @@
+
+*** ======================================================================
+*** NAMES AND LINKS
+*** ======================================================================
+
+--------------------------------------------------------------------------
+--- This file defines 3 modules: NAME, LINK, CHAIN.
+
+--- Module NAME defines the following sorts: 
+---  - Name, subsort of Qid, representing names (e.g., 'a , 'b, etc) 
+---  - VName representing virtual names (boxes) 
+---  - SName containing the 2 sorts above plus tau (the
+---    silent action).
+ 
+--- Module LINK defines Virtual links (box \ box), solid links (e.g., 
+--- 'a \ 'b) and Links as the union of virtual and solid links.
+
+--- Module CHAIN builds chains of links by juxtapositions (ex,. 
+--- tau \ a a \ tau)
+--------------------------------------------------------------------------
+
+
+----------------------------
+*** Names
+----------------------------
+fmod NAME is
+    protecting QID .
+    protecting NAT .
+    protecting STRING .
+    protecting CONVERSION .
+    
+    sort Name . *** Set of names (not including tau)
+    sort VName . *** virtual name (only box belongs to it)
+    sort SName . *** solid name (tau or name)
+    
+    *** Building Names
+    subsort Qid < Name < SName . *** With Qids + Tau
+    
+    op tau : -> SName [ctor] . *** tau
+    op box : -> VName [ctor] . *** box
+
+    --- substituting a solid name by another solid name
+    op subs : SName SName SName -> SName .
+    vars sn sn' sn'' : SName .
+    ceq subs(sn , sn' , sn'') = sn if sn =/= sn' .
+    ceq subs(sn , sn' , sn'') = sn'' if sn == sn' .
+
+      --- Fresh names
+    op new : Name Nat -> Name [ctor] . 
+    
+    op toString : SName -> String .
+    op toString : VName -> String .
+    eq toString(q:Qid) = string(q:Qid) .
+    eq toString(v:VName) = "*" .
+    eq toString(tau) = "tau" .
+
+endfm
+
+---------------------------------------------------
+--- Sets of Names
+---------------------------------------------------
+view Name from TRIV to NAME is
+    sort Elt to Name .
+endv
+
+fmod SET-NAME is
+    protecting SET{Name} * (sort Set{Name} to SetName) .
+    
+    op toString : SetName -> String .
+    eq toString(empty) = "" .
+    eq toString( (x:Name , S:SetName) ) = toString(x:Name) + " " + toString(S:SetName) .
+endfm
+
+----------------------------
+*** LINKS
+----------------------------
+fmod LINK is
+    protecting SET-NAME *  (op _\_ : SetName SetName -> SetName to _\\_ ) .
+    protecting BOOL .
+    protecting NAT .
+
+    sort VLink . *** virtual link (only box \ box belongs to)
+    sort SLink . *** solid links
+    sort Link . *** virtual + solid
+
+    *** Building links
+    subsort SLink VLink < Link .
+
+    op Box : -> VLink  . *** representation of box \ box
+    eq Box = box \ box .
+    
+    op _\_ : SName SName -> SLink [ctor prec 15] . *** solid links
+    op _\_ : VName VName -> VLink [ctor prec 15] . *** virtual link
+    
+    vars sn sn' sa sb : SName .
+    vars sl : SLink .
+    var S : SetName .
+
+    --- Testing whether a solid name is in a solid link
+    op isIn? : SName SLink -> Bool .
+    op isIn? : SetName SLink -> Bool .
+    eq isIn?(sn , sn \ sn') = true .
+    eq isIn?(sn , sl) = false [owise] .
+
+    op isOut? : SName SLink -> Bool .
+    eq isOut?(sn , sn' \ sn) = true .
+    eq isOut?(sn , sl) = false [owise] .
+
+    op in : SName SLink -> Bool .
+    eq in(sn , sl) = isIn?(sn, sl) or isOut?(sn, sl) .
+    
+    --- Testing whether the input/output of a link occurs in a set of names
+    op isLocalIn? : SetName SLink -> Bool .
+    eq isLocalIn?(S , tau \ y:SName) = false .
+    eq isLocalIn?(S , x:Name \ y:SName) = x:Name in S .
+
+    op isLocalOut? : SetName SLink -> Bool .
+    eq isLocalOut?(S , y:SName \ tau) = false .
+    eq isLocalOut?(S , y:SName \ x:Name) = x:Name in S .
+
+    op isLocal? : SetName SLink -> Bool .
+    eq isLocal?(S , sl) = isLocalIn?(S, sl) or isLocalOut?(S, sl) .
+    
+    --- Testing if a solid name is in a set of Names 
+    op inSet : SName SetName -> Bool .
+    eq inSet(tau, S) = false .
+    eq inSet(x:Name, S) = x:Name in S .
+
+    --- subsituting a solid name in a solid link
+    op subs : SLink SName SName -> SLink .
+    eq subs(sn \ sn' , sa , sb) = subs(sn, sa, sb) \ subs(sn', sa, sb) .
+    eq subs( tau \ sn , sa, sb ) = tau \ subs(sn, sa, sb) .
+    eq subs( sn \ tau , sa, sb ) = subs(sn, sa, sb) \ tau .
+
+
+    --- Free names in a link
+    op freeNames : SLink -> SetName .
+    eq freeNames(x:Name \ y:Name) = x:Name , y:Name .
+    eq freeNames(x:Name \ tau) = x:Name .
+    eq freeNames(tau \ y:Name) = y:Name .
+    eq freeNames(tau \ tau) = empty .
+
+    op toString : Link -> String .
+    eq  toString(v:VLink) = "* / *" .
+    eq  toString(sn \ sn') = toString(sn) + " / " + toString(sn') .
+    
+endfm
+
+----------------------------
+*** Chains 
+----------------------------
+fmod CHAINS is
+    protecting LINK .
+    sort Chain . *** Chains
+    
+    *** Building chains
+    subsort Link < Chain .
+    op _._ : Chain Chain -> Chain [ctor assoc] .
+    op error : -> Chain [ctor] . *** an invalid chain
+    
+    *** ------------------
+    var vl : VLink .
+    vars sl sl' : SLink .
+    vars l l' : Link .
+    vars ch ch' : Chain .
+    vars a b c : SName .  *** a' b' c' n1 n2 n3 n4 : SName .
+    vars x y : Name . ***   z z' : Name .
+    *** ------------------
+
+    ----------------------------
+    *** Behavior of error
+    *** 1. Tau does not match box
+    *** 2. Solid links must match
+    ----------------------------
+    eq error . l = error .
+    eq l . error = error .
+    ceq x \ a . b \ y = error if a =/= b . 
+    eq x \ tau . vl = error . 
+    eq vl . tau \ y = error .
+    ----------------------------
+      
+    ----------------------------
+    *** Some Auxiliar Definitions for chains
+    ----------------------------
+    *** Solid chains only composed of solid links
+    op isSolid : Chain -> Bool .
+    eq isSolid(vl) = false .
+    eq isSolid(error) = false .
+    eq isSolid(sl) = true .
+    eq isSolid(l . ch) = isSolid(l) and isSolid(ch) .
+
+    *** pureVirtual (only boxes)
+    op isPureVirtual : Chain -> Bool .
+    eq isPureVirtual(vl) = true .
+    eq isPureVirtual(sl) = false .
+    eq isPureVirtual(error) = false .
+    eq isPureVirtual(l . ch) = isPureVirtual(l) and isPureVirtual(ch) .
+		
+    *** simple: one solid link and the rest are virtual
+    op isSimple : Chain -> Bool .
+    eq isSimple(vl) = false .
+    eq isSimple(error) = false .
+    eq isSimple(sl) = true .
+    eq isSimple(vl . ch) = isSimple(ch) .
+    eq isSimple(sl . ch) = isPureVirtual(ch) .
+
+    *** Valid chain :(relies mainly on the behavior of error)
+    *** A valid chain must have at least a solid ink
+    op isValid : Chain -> Bool .
+    eq isValid(ch) = ch =/= error and not isPureVirtual(ch) .
+    
+    *** Merging 2 chains
+    op _*_ : Chain Chain -> Chain [comm prec 80] .
+    eq vl * vl = vl .
+    eq sl * vl = sl .
+    eq sl * sl' = error .
+    eq (l . ch) * (l' . ch') = (l * l') . (ch * ch') .
+    eq (l) * (l' . ch') = error . *** length doesnt match
+endfm

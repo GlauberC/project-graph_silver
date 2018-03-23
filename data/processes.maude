@@ -1,0 +1,140 @@
+*** =========================================
+*** PROCESS DEFINITIONS (Syntax)
+*** =========================================
+
+----------------------------------------------------------------------
+--- Processes are built as follows:
+--- * 0 (inaction)
+--- * l . P where l is a solid link
+--- * P + Q
+--- * P | Q
+--- * [S] P where S is a (comma-separated) set of  names (restriction)
+--- * { A} where A (a Qid) is a process name
+---		
+--- Processes are defined by using the syntax A =d= P .
+----------------------------------------------------------------------
+load links .
+fmod PROCESS is
+    protecting LINK .
+    --------------------------
+    *** Process Definition
+    --------------------------
+    sorts SeqProcess Process .
+    subsort SeqProcess < Process .
+    op 0 : -> SeqProcess [ctor] .
+    op _._ : SLink Process -> SeqProcess    [frozen ctor prec 20] .
+    op _+_ : SeqProcess SeqProcess -> SeqProcess  [frozen ctor prec 40] .
+    op _|_ : Process Process -> Process  [frozen ctor  prec 60] .
+    op [_]_ : SetName Process -> Process [frozen ctor prec 80] .
+    op {_} :  Qid -> Process [frozen ctor] .
+
+    var sl : SLink .
+    vars P Q : Process .
+    vars S S'  : SetName .
+    
+    ---------------------------
+    *** Structural Congruence
+    ---------------------------
+    eq 0 | P = P .
+    eq P | 0 = P .
+    eq 0 + P = P .
+    eq P + 0 = P .
+    eq [S] 0 = 0 .
+    eq [empty] P = P .
+    eq [S] [S'] P = [S, S'] P .
+
+    op toString : Process -> String .
+    eq toString(sl . P) = toString(sl) + "." + toString(P) .
+    eq toString(0) = "0" .
+    eq toString(P + Q) = toString(P) + " + " + toString(Q) .
+    eq toString(P | Q) = toString(P) + " | " + toString(Q) .
+    eq toString([S] P) = "[" + toString(S) + "] " + toString(P) .
+    eq toString({ A:Qid}) = string(A:Qid) .
+endfm
+
+
+-----------------------------------------------------
+--- Sets and lists of processes
+-----------------------------------------------------    
+view Process from TRIV to PROCESS is
+    sort Elt to Process .
+endv
+
+fmod SET-PROC is
+    protecting SET{Process} * (sort Set{Process} to SProcess, sort NeSet{Process} to NESProcess) .
+endfm
+
+
+fmod LIST-PROC is
+    protecting LIST{Process} * (sort List{Process} to LProcess  ) .
+endfm
+
+--- Commutative Paris of Processes
+fmod PAIR-PROC is
+    sort PairProc .
+    protecting PROCESS .
+    op p : Process Process -> PairProc [ctor comm] .
+    
+endfm
+
+view PairProc from TRIV to PAIR-PROC is
+    sort Elt to PairProc .
+endv
+    
+
+fmod SET-PAIR-PROC is
+    protecting SET{PairProc} * (sort Set{PairProc} to SPairProc, sort NeSet{PairProc} to NESPairProc) .
+endfm
+    
+
+---------------------------
+*** PROCESS DEFINITION
+---------------------------
+fmod DEFINITION is
+    protecting PROCESS .
+    
+    sort Definition .
+    op _=d=_ : Qid Process -> Definition [ctor frozen prec 90] .
+endfm
+
+view Definition from TRIV to DEFINITION is
+    sort Elt to Definition .
+endv
+    
+fmod SET-DEFINITION is
+    protecting SET{Definition} * (sort Set{Definition} to SDefinition , sort NeSet{Definition} to NESDefinition) .
+endfm
+
+    
+---------------------------
+*** PROCESS + DEFINITION
+---------------------------
+fmod PROC-CTX is
+    protecting SET-DEFINITION * ( op _\_ : SDefinition SDefinition -> SDefinition to _\D\_ ) .
+    protecting SET-PROC * ( op _\_ : SProcess SProcess -> SProcess to _\P\_ ) .
+    
+    var A : Qid .
+    var D : Definition .
+    var SD : SDefinition .
+    var S : SetName .
+    vars P Q : Process .
+    var sl : SLink .
+    *** Returning the needed process definition
+    op getProc : Qid SDefinition -> Process .
+    eq getProc(A , empty) = 0 .
+    eq getProc(A , ((A =d= P), SD)) = P .
+    eq getProc(A , SD) = 0 [owise] .
+    
+    sort CtxProc .
+    op _@_ : Process SDefinition -> CtxProc [ctor prec 95 frozen] .
+    
+    --- Free names (wrt a set of process definitions)
+    op freeNames : CtxProc -> SetName .
+    eq freeNames(sl . P @ SD) = freeNames(sl), freeNames(P @ SD) .
+    eq freeNames(0 @ SD) = empty .
+    eq freeNames(P + Q @ SD) = freeNames(P  @ SD) , freeNames(Q  @ SD) .
+    eq freeNames(P | Q @ SD) = freeNames(P  @ SD) , freeNames(Q  @ SD) .
+    eq freeNames([S] P @ SD) = freeNames(P  @ SD) \\ S .
+    eq freeNames({ A:Qid} @ SD) = freeNames(getProc(A:Qid, SD)  @ SD) .
+
+endfm

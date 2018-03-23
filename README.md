@@ -6,7 +6,11 @@ This repository create a forced direct graph from maude file called SiLVer# proj
 Version history:
 
  v 4.x
-
+    
+    4.3  
+        Better organization of files in folders  
+        It was written comments in all files  
+        Maude files added on data directory  
     4.2  
         Added click function to create a highlight on node.    
     4.1.3  

@@ -1,0 +1,409 @@
+load modelchecking . 
+    
+-----------------------------------------   
+--- Table of Contents
+--- 1. One step transitions
+--- 2. Traces
+--- 3. Label transition system and generation
+---    of a DOT file (graph)
+--- 4. Model Checking
+--- 5. Bisimulation 
+--- 6. Dinning Philosopher problem.
+--- 7. (Bounded) Counter (a la CCS)
+--- 8. Scheduler (a la CCS)
+--- 9. Transportation system
+--- 10. Peterson Algorithm
+-----------------------------------------    
+
+
+----------------------------------------------
+--- 1 One step transitions
+----------------------------------------------
+--- Results are terms of the form <L , P> (of type ActProcess)
+--- where L is a symbolic configuration and P is a process. 
+
+--- Prefix
+rew in SYM-SEMANTICS : step('a \ 'b . 0 , empty ) .
+--- Choice
+rew in SYM-SEMANTICS : step('a \ 'b . 0 + 'c \ 'd . 0 , empty ) .
+--- All transitions from a process
+search in SYM-SEMANTICS : step('a \ 'b . 0 + 'c \ 'd . 0 , empty ) =>! A:ActProcess .
+--- Parallel composition
+search in SYM-SEMANTICS : step('a \ 'b . 0 | 'c \ 'd . 0 , empty ) =>! A:ActProcess .
+--- Restriction
+search in SYM-SEMANTICS : step(['a] 'a \ 'b . 0 | 'c \ 'a . 0 , empty ) =>! A:ActProcess .
+--- Recursion
+search in SYM-SEMANTICS : step({ 'A}  , 'A =d= 'a \ 'b . { 'A } ) =>! A:ActProcess .
+search in SYM-SEMANTICS : step({ 'A} | { 'B } , ('A =d= 'a \ 'b . { 'A } , 'B =d= 'c \ 'd . 0) ) =>! A:ActProcess .
+
+----------------------------------------------
+--- 2 Traces
+----------------------------------------------
+--- Results are of the form < P , trace , D > where
+--- P is the last process in the sequence of transitions
+--- trace is a sequence of symbolic configurations and
+--- D a set of process definitions. 
+rew in SYM-TRACE : trace('a \ 'b . 0 , empty ) .
+rew in SYM-TRACE : trace('a \ 'b . 'c \ 'd . 0 , empty ) .
+--- Generating traces of length 3.
+search in SYM-TRACE : trace({ 'A}  , 'A =d= 'a \ 'b . { 'A } , 3 ) =>! T:TraceConf .
+search in SYM-TRACE : trace({ 'A} | { 'B }  , ('A =d= 'a \ 'b . { 'A }, 'B =d= 'c \ 'd . { 'B} ) , 3 ) =>! T:TraceConf .
+search in SYM-TRACE : trace(['a ]{ 'A} | { 'B }  , ('A =d= 'a \ 'b . { 'A }, 'B =d= 'c \ 'a . { 'B} ) , 3 ) =>! T:TraceConf .
+search in SYM-TRACE : trace({ 'A}  , 'A =d= 'a \ 'b . { 'A } + 'c \ 'd . 0   , 3 ) =>! T:TraceConf .
+
+--------------------------------------
+--- 3. Label transition system (graph)
+--------------------------------------
+--- Transitions systems are represented via terms of the form
+--- < SP, LP , ST , SD> where:
+--- - SP is the set of processes (states) already visited
+--- - LP is the list of processes that need to be visited
+--- - ST is a set of transitions of the form {P , C , Q}
+---   meaning that P goes to Q with label C.
+--- - SD is a set of process definitions.
+
+rew in SIG-GRAPH : initGraph({ 'A}  , 'A =d= 'a \ 'b . { 'A }) .
+rew in SIG-GRAPH : initGraph({ 'A}  , 'A =d= 'a \ 'b . { 'A } + 'c \ 'd . 0) .
+
+--- A dot (https://en.wikipedia.org/wiki/DOT_(graph_description_language))
+--- file can be generated as follows:
+rew in GRAPH-2-DOT : generateDot({ 'A} , ('A =d= 'a \ 'b . (tau \ 'c . { 'B} | tau \ 'd . { 'C} ) , 'B =d= 'e \ 'f . { 'C} , 'C =d= 'g \ 'h . { 'B})) .
+--- Note that the \" character in Maude must be replaced by "
+
+--------------------------------------
+--- 4. Model Checking
+--------------------------------------
+--- SMLM formulas are: tt (true), ff (false), AND (conjunction),
+--- OR(disjunction), [[ C ]] F (box modality) and << C >> F (diamond modality) 
+--- LTL formulas of Maude's model checker include [] (always), <> (eventually)
+
+--- The process can affor a transition << >> modality
+red in SLML_MC : modelCheck('a \ 'b . 0 , empty ,  << 'a \ 'b >>  tt) . *** true
+red in SLML_MC : modelCheck('a \ 'b . 0 , empty ,  << 'c \ 'd >>  tt) . *** false
+--- The process cannot afford a 'c \ 'd transition
+red in SLML_MC : modelCheck('a \ 'b . 0 , empty ,  [[ 'c \ 'd ]] ff) .
+--- 0 cannot afford any transition
+red in SLML_MC : modelCheck( 0 , empty ,  [[ ANY ]] ff) .
+--- There exists a path where after a 'c\'d transition, the process cannot afford a 'a\'b transition
+red in SLML_MC :  modelCheck('c \ 'd . 'a \ 'b . 0 + 'c \ 'd . 0 , empty ,  << 'c \ 'd >> [[ 'a \ 'b ]] ff) .
+
+--- Always {'A } can afford a 'a\'b transition
+red in SLML_MC : modelCheck({'A} , 'A =d= 'a \ 'b . {'A } ,  [] (<< 'a \ 'b >> tt)) .
+red in SLML_MC : modelCheck({'A} , 'A =d= 'a \ 'b . {'A } + 'c \ 'd . 0 ,  [] (<< 'a \ 'b >> tt)) . *** false
+
+*** Parallel
+red in SLML_MC : modelCheck('a \ 'b . 0 | 'c \ 'd . 0 , empty,   << 'c \ 'd ; 'a \ 'b >> tt) .
+   
+*** Checking a deadlock
+red in SLML_MC : modelCheck({'A } @ 'A =d= 'a \ 'b . {'A } + 'c \ 'd . 0  ,  [] ( << ANY >> tt )) . *** false
+*** alternatively:
+search  st({'A } @ 'A =d= 'a \ 'b . {'A } + 'c \ 'd . 0) =>! X:State .
+
+*** examples in the  paper
+red in SLML_MC : modelCheck( { 'A} , ('A =d= 'a \ 'b . (tau \ 'c . { 'B} | tau \ 'd . { 'C} ) , 'B =d= 'e \ 'f . { 'C} , 'C =d= 'g \ 'h . { 'B}) , << 'a \ 'b >> tt) .
+red in SLML_MC : modelCheck( { 'A} , ('A =d= 'a \ 'b . (tau \ 'c . { 'B} | tau \ 'd . { 'C} ) , 'B =d= 'e \ 'f . { 'C} , 'C =d= 'g \ 'h . { 'B}) , [] <> << 'e \ 'f >> tt) .
+red in SLML_MC : modelCheck( { 'A} , ('A =d= 'a \ 'b . (tau \ 'c . { 'B} | tau \ 'd . { 'C} ) , 'B =d= 'e \ 'f . { 'C} , 'C =d= 'g \ 'h . { 'B}) , []  ( (<< 'e \ 'f >> tt) -> << 'g \ 'h >> tt)) . *** fasle
+
+--------------------------------------
+--- 5. Bisimulation
+--------------------------------------
+red in BISIMULATION : bisimilar?(0, 0) .
+red in BISIMULATION : getBisimulation('a \ 'b . 0 , 0) .
+red in BISIMULATION : bisimilar?('a \ 'b . 0 , 0) .
+red in BISIMULATION : getBisimulation('a \ 'b . 0 , 'a \ 'c . 0) .
+red in BISIMULATION : bisimilar?('a \ 'b . 0 , 'a \ 'c . 0) .
+red in BISIMULATION : getBisimulation('a \ 'b . 0 | 'c \ 'd . 0  , 'c \ 'd . 0 | 'a \ 'b . 0) .
+red in BISIMULATION : bisimilar?('a \ 'b . 0 | 'c \ 'd . 0  , 'c \ 'd . 0 | 'a \ 'b . 0) .
+red in BISIMULATION : getBisimulation('b \ 'c . 0 , ['a] 'b \ 'a  . 0 | 'a \ 'c . 0) .
+red in BISIMULATION : bisimilar?('b \ 'c . 0 , ['a] 'b \ 'a  . 0 | 'a \ 'c . 0) .
+red in BISIMULATION : bisimilar?(tau \ tau . 0 , 0 ) .
+red in BISIMULATION : getBisimulation('a \ 'b . { 'A} , { 'A } , 'A =d= 'a \ 'b . { 'A}) .
+red in BISIMULATION : bisimilar? ('a \ 'b . { 'A} , { 'A } , 'A =d= 'a \ 'b . { 'A}) .
+red in BISIMULATION : getBisimulation(tau \ tau . 0 | 'a \ 'b . 0 ,  tau \ tau . 'a \ 'b . 0  + 'a \ 'b . tau \ tau . 0) .
+red in BISIMULATION : bisimilar?(tau \ tau . 0 | 'a \ 'b . 0 ,  tau \ tau . 'a \ 'b . 0  + 'a \ 'b . tau \ tau . 0) .
+red in BISIMULATION : bisimilar?(['a]tau \ 'a . 0 | 'a \ tau . 0, tau \ tau . 0) .
+
+---------------------------------------
+--- 6. Dinning Philosopher problem.
+---------------------------------------
+mod DP is
+    protecting NAT .
+    protecting STRING .
+    protecting CONVERSION .
+    protecting GRAPH-2-DOT .
+    protecting SLML_MC * (sort Transition to MCTransition) .
+    protecting BISIMULATION .
+
+    vars n m : Nat .
+    vars s s' : String .
+
+    op toName : String Nat -> Qid .
+    op toName : String Nat String -> Qid .
+    eq toName(s, n) = qid(s + "_" + string(n, 10)) .
+    eq toName(s, n, s') = qid(s + "_" + string(n, 10) + "_" + s') .
+
+    ----------------------------------
+    --- Process definitions
+    ----------------------------------
+    op Fork : Nat -> SDefinition .
+    eq Fork(n) = toName("F", n) =d= (tau \ toName("u" , n, "R") . tau \ toName("d" , n) . { toName("F", n)}) + (toName("u", n, "L") \ tau . toName("d" ,n ) \ tau . { toName("F", n)}) .
+    op Phil : Nat Nat -> SDefinition .
+    eq Phil(n, m) = toName("P", n) =d= ( (tau \ toName("think", n) .  { toName("P", n)}) + toName("u", n , "R") \ toName("u" , s n rem m, "L")  . { toName("eat" , n)} ) ,
+	toName("eat" , n) =d= (tau \ toName("eat", n) . {toName("release" , n)} ) , toName("release" , n) =d= (toName("d" , n) \ toName("d", s n rem m) . { toName("P", n) }) .
+    
+
+    *** Building the processes and processes definitions
+    op DPhilProc : Nat -> Process .
+    op DPhilProc : Nat Nat -> Process .
+    op DPhilNames : Nat -> SetName .
+    eq DPhilNames(0) = toName("u", 0 , "L"),  toName("u", 0 , "R"), toName("d", 0) .
+    eq DPhilNames(s n) = toName("u" , s n, "L" ), toName("u" , s n, "R" ), toName("d" ,s n), DPhilNames(n) .
+    
+    eq DPhilProc(n) = [ DPhilNames(sd(n , 1)) ] DPhilProc(sd(n , 1), n) .
+    eq DPhilProc(0 , m) = { toName("P", 0) } | { toName("F", 0) } .
+    eq DPhilProc(s n , m) = { toName("P", s n)} | ({ toName("F", s n)} | DPhilProc(n, m)) .
+
+    op DPhilDef : Nat -> SDefinition .
+    op DPhilDef : Nat Nat -> SDefinition .
+    eq DPhilDef(n) = DPhilDef(sd(n , 1), n) .
+    eq DPhilDef(0 , m) = Phil(0, m) , Fork(0) .
+    eq DPhilDef(s n , m) = Phil(s n, m) , Fork(s n) , DPhilDef(n, m) .
+    op DPhil : Nat -> CtxProc .
+    eq DPhil(n) = DPhilProc(n) @ DPhilDef(n) . 
+
+    *** Example of specification for DP(2)
+    op Dphi2SpecD : -> SDefinition .
+    op DPhi2SpecP : -> Process .
+    eq Dphi2SpecD = (
+	  ('tk01 =d= tau \ 'think_0 . { 'tk01 } + (tau \ 'think_1 . { 'tk01 } + (tau \ tau . { 'eat0 } + tau \ tau . { 'eat1} )) ),
+	  ('eat0 =d= tau \ 'think_1 . { 'eat0 } + tau \ 'eat_0 . { 'rel0}),
+	  ('rel0 =d= tau \ 'think_1 . { 'rel0 } + tau \ tau . { 'tk01}),
+	  ('eat1 =d= tau \ 'think_0 . { 'eat1 } + tau \ 'eat_1 . { 'rel1}),
+	  ('rel1 =d= tau \ 'think_0 . { 'rel1 } + tau \ tau . { 'tk01})) .
+    eq DPhi2SpecP = { 'tk01} .
+    *** Example of specification for DP(3)
+    op Dphi3SpecD : -> SDefinition .
+    op DPhi3SpecP : -> Process .
+    eq Dphi3SpecD = 
+	('tk012 =d= tau \ 'think_0 . { 'tk012 } + (tau \ 'think_1 . { 'tk012 } + ( tau \ 'think_2 . { 'tk012}  + (tau \ tau . { 'eat0 } + ( tau \ tau . { 'eat1} + tau \ tau . { 'eat2})) ))),
+	('eat0 =d= tau \ 'think_1 . { 'eat0 } + (tau \ 'think_2 . { 'eat0} + tau \ 'eat_0 . { 'rel0})),
+	('eat1 =d= tau \ 'think_0 . { 'eat1 } + (tau \ 'think_2 . { 'eat1} + tau \ 'eat_1 . { 'rel1})),
+	('eat2 =d= tau \ 'think_0 . { 'eat2 } + (tau \ 'think_1 . { 'eat2} + tau \ 'eat_2 . { 'rel2})),
+	('rel0 =d= tau \ 'think_1 . { 'rel0 } + (tau \ 'think_2 . { 'rel0} + tau \ tau . { 'tk012})),
+	('rel1 =d= tau \ 'think_0 . { 'rel1 } + (tau \ 'think_2 . { 'rel1} + tau \ tau . { 'tk012})),
+	('rel2 =d= tau \ 'think_0 . { 'rel2 } + (tau \ 'think_1 . { 'rel2} + tau \ tau . { 'tk012})) .
+    eq DPhi3SpecP = { 'tk012} .
+endm
+
+--- One transition
+search step(DPhilProc(3) ,  DPhilDef(3)) =>1 A:ActProcess .
+--- The graph
+rew  generateDot(DPhilProc(3) ,  DPhilDef(3)) .
+rew  generateDot(DPhi3SpecP  ,  Dphi3SpecD) .
+--- Model Checking
+--- Free ok deadlocks
+red modelCheck( DPhilProc(3) ,  DPhilDef(3) , [] << ANY >> tt ) . 
+--- if 3 can eat, then 3 cannot think
+red modelCheck( DPhilProc(3) ,  DPhilDef(3) , []  ( (<< tau \ 'eat_3 >> tt) -> ([[ tau \ 'think_3 ]] ff))) . 
+--- if 3 eats, then 0 cannot eat
+red modelCheck( DPhilProc(3) ,  DPhilDef(3) , []  ( (<< tau \ 'eat_3 >> tt) -> ([[ tau \ 'eat_0 ]] ff)  )) .
+--- In DF(4), there is a state where both P0 and P2 can eat
+search st( DPhilProc(4) @  DPhilDef(4) ) =>* S:st such that S:st |= ( (<< tau \ 'eat_0 >> tt) AND (<< tau \ 'eat_2 >> tt) ) .
+--- DF(2) and its specification are bisimilar
+red bisimilar?(DPhilProc(2) ,  DPhilDef(2), DPhi2SpecP  ,  Dphi2SpecD) .
+red bisimilar?(DPhilProc(3) ,  DPhilDef(3), DPhi3SpecP  ,  Dphi3SpecD) .
+
+
+
+----------------------------------------------
+--- 7 (Bounded) Counter 
+----------------------------------------------
+mod CCS_COUNTER is
+    protecting SLML_MC * (sort Transition to MCTransition) .
+    protecting GRAPH-2-DOT .
+    *** Definition of a counter
+    op countDef : -> Definition .
+    eq countDef = 'C =d= (tau \ 'zero  . { 'C }  + 'inc \ tau . (['a] { 'C2}  | 'a \ tau . { 'C} )) ,
+	'C2 =d= ('dec \ tau . tau \ 'a . 0 + 'inc \ tau . (['b] { 'C3 } | 'b \ tau . { 'C2 })) ,
+	'C3 =d= ('dec \ tau . tau \ 'b . 0 + 'inc \ tau . (['a] { 'C2 } | 'a \ tau . {'C3 })) .
+endm
+*** Graph
+*** after incrementing and then decrementing, there is a tau \zero transition. 
+red modelCheck(['dec,  'inc] { 'C } | tau \ 'inc . tau \ 'dec . 0 , countDef , <> (<< tau \ 'zero >> tt)  ) .
+
+----------------------------------------------
+--- 8 Scheduler (Example in Milner's book)
+----------------------------------------------
+
+mod SCHEDULER is
+    protecting NAT .
+    protecting STRING .
+    protecting CONVERSION .
+    protecting GRAPH-2-DOT .
+    
+
+    vars n m : Nat .
+    vars s s' : String .
+
+    op SC1-0 : -> Definition . eq SC1-0 = 'SC1-0 =d= tau \ 'a1 . { 'SC2-1 } .
+    op SC1-1 : -> Definition . eq SC1-1 = 'SC1-1 =d= tau \ 'b1 . { 'SC1-0 } .
+    op SC1-2 : -> Definition . eq SC1-2 = 'SC1-2 =d= tau \ 'b2 . { 'SC1-0 } + tau \ 'a1 . { 'SC2-12 }.
+    op SC1-12 : -> Definition . eq SC1-12 = 'SC1-12 =d= tau \ 'b1 . { 'SC1-2 } + tau \ 'b2 . { 'SC1-1 }.
+    op SC2-0 : -> Definition . eq SC2-0 = 'SC2-0 =d= tau \ 'a2 . { 'SC1-2 } .
+    op SC2-1 : -> Definition . eq SC2-1 = 'SC2-1 =d= tau \ 'b1 . { 'SC2-0 } + tau \ 'a2 . { 'SC1-12 } .
+    op SC2-2 : -> Definition . eq SC2-2 = 'SC2-2 =d= tau \ 'b2 . { 'SC2-0 } .
+    op SC2-12 : -> Definition . eq SC2-12 = 'SC2-12 =d= tau \ 'b1 . { 'SC2-2 } + tau \ 'b2 . { 'SC2-1 }.
+
+    op DEF : -> SDefinition .
+    eq DEF = SC1-0 , SC1-1, SC1-2, SC1-12, SC2-0 , SC2-1, SC2-2, SC2-12 .
+    op PROC : -> Process .
+    eq PROC = { 'SC1-0} .
+
+    op A1 : -> Definition .
+    eq A1 = 'A1 =d= tau \ 'a1 . { 'C1 } .
+    op C1 : -> Definition .
+    eq C1 = 'C1 =d= tau \ 'c1 . { 'B1 } .
+    op B1 : -> Definition .
+    eq B1 = 'B1 =d= tau \ 'b1 . { 'D1 } .
+    op D1 : -> Definition .
+    eq D1 = 'D1 =d= 'c2 \ tau . { 'A1 } .
+
+    op A2 : -> Definition .
+    eq A2 = 'A2 =d= tau \ 'a2 . { 'C2 } .
+    op C2 : -> Definition .
+    eq C2 = 'C2 =d= tau \ 'c2 . { 'B2 } .
+    op B2 : -> Definition .
+    eq B2 = 'B2 =d= tau \ 'b2 . { 'D2 } .
+    op D2 : -> Definition .
+    eq D2 = 'D2 =d= 'c1 \ tau . { 'A2 } .
+
+    
+    op PROC2 : -> Process .
+    eq PROC2 = ['c1 , 'c2] { 'A1} | { 'D2} .
+endm
+*** Generating the 2 (different) transition systems    
+rew generateDot(PROC , DEF) .
+rew generateDot(PROC2 , (A1, B1, C1, D1, A2, B2, C2, D2 )) .
+
+----------------------------------------------
+--- 9. Transportation System
+----------------------------------------------
+mod TRANSPORT is
+    protecting NAT .
+    protecting STRING .
+    protecting CONVERSION .
+    protecting SIG-GRAPH .
+    vars n m s1 s2 : Nat .
+    vars S s s' : String .
+
+    
+    op toName : String Nat -> Qid .
+    op toName : String Nat String -> Qid .
+    eq toName(s, n) = qid(s + "_" + string(n, 10)) .
+    eq toName(s, n, s') = qid(s + "_" + string(n, 10) + "_" + s') .
+
+    ----------------------------------
+    --- Process definitions
+    ----------------------------------
+    --- Statations
+    op SDef : Nat -> Definition .
+    eq SDef(n) = toName("S", n) =d= toName("in",n) \ toName("out", n) . { toName("S", n) } .
+    op SDefs : Nat -> SDefinition .
+    eq SDefs(0) = empty .
+    eq SDefs(n) = SDef(n) , SDefs(sd(n,1)) [owise] .
+    
+    op SProc : Nat -> Process .
+    eq SProc(n) = { toName("S", n) } .
+    op SProcs : Nat -> Process .
+    eq SProcs(0) = 0 .
+    eq SProcs(n) = SProc(n) | SProcs(sd(n,1)) [owise] .
+      --- Local Names
+    op SNames : Nat -> SetName .
+    eq SNames(0) = empty .
+    eq SNames(n) = toName("in", n) , toName("out", n) , SNames(sd(n,1))  [owise] .
+    
+    
+    --- Transport Network
+    *** Kind (Metro, Bus, Train), Number (identifier), Source and Destination
+    op TransDef : String Nat Nat Nat -> Definition . *** Number of Metro + Source + Destination
+    eq TransDef(S, n, s1, s2) = toName(S, n) =d= toName("out",s1) \ toName(S, n) . 0  | toName(S, n) \ toName("in", s2) . { toName(S, n) } .
+    op TransNames : String Nat -> SetName .
+    eq TransNames(S, 0) = empty .
+    eq TransNames(S, n) = toName(S, n) , TransNames(S, sd(n,1)) [owise] .
+    op TransProc : String Nat -> Process .
+    eq TransProc(S, 0) = 0 .
+    eq TransProc(S, n) = { toName(S , n) } | TransProc(S, sd(n,1)) [owise] .
+    
+
+    *** Passenger
+    op User : Nat Nat -> Process . *** Source Destination
+    eq User(s1,s2) = tau \ toName("in", s1) . 0 | toName("out", s2) \ tau . 0 .
+    
+endm
+
+*** 3 metros, 2 buses, 3 stations. 
+search step( ([SNames(3), TransNames("M", 3), TransNames("B", 2)] User(1,3) |  (SProcs(3) | (TransProc("M", 3) | TransProc("B", 2) ))) @  (SDefs(3) , TransDef("M", 1, 1 ,2), TransDef("M", 2, 2 ,3), TransDef("M", 3, 3 ,1) ) ) =>1 AP:ActProcess .
+
+*** 5 metros, 4 stations (2 possible solutions)
+***search step( ([SNames(5), TransNames("M", 5)] User(3,1) |  SProcs(4) | TransProc("M", 5)  ) @  (SDefs(4) , TransDef("M", 1, 4 ,1), TransDef("M", 2, 2 ,4), TransDef("M", 3, 3 ,2), TransDef("M", 4, 1 ,2), TransDef("M", 5, 3 ,1) ) ) =>1 AP:ActProcess .
+
+----------------------------------------------
+--- 10. Peterson Algorithm
+----------------------------------------------
+mod PETERSON is
+    protecting NAT .
+    protecting STRING .
+    protecting CONVERSION .
+    protecting GRAPH-2-DOT .
+    protecting SLML_MC * (sort Transition to MCTransition) .
+    protecting BISIMULATION .
+
+    vars n m : Nat .
+    vars s s' : String .
+
+    op toName : String Nat -> Qid .
+    op toName : String Nat String -> Qid .
+    eq toName(s, n) = qid(s + "_" + string(n, 10)) .
+    eq toName(s, n, s') = qid(s + "_" + string(n, 10) + "_" + s') .
+
+    ----------------------------------
+    --- Process definitions
+    ----------------------------------
+    op BT1 :  -> SDefinition .
+    op BF1 :  -> SDefinition .
+    eq BF1 = 'B1f =d= tau \ 'b1rf . { 'B1f} +  (('b1wf \ tau . { 'B1f} ) +  'b1wt \ tau . { 'B1t}) .
+    eq BT1 = 'B1t =d= tau \ 'b1rt . { 'B1t} +  (('b1wf \ tau . { 'B1f} ) +  'b1wt \ tau . { 'B1t}) .
+    op BT2 :  -> SDefinition .
+    op BF2 :  -> SDefinition .
+    eq BF2 = 'B2f =d= tau \ 'b2rf . { 'B2f} +  (('b2wf \ tau . { 'B2f} ) +  'b2wt \ tau . { 'B2t}) .
+    eq BT2 = 'B2t =d= tau \ 'b2rt . { 'B2t} +  (('b2wf \ tau . { 'B2f} ) +  'b2wt \ tau . { 'B2t}) .
+    
+    op K1 :  -> SDefinition .
+    op K2 :  -> SDefinition .
+    eq K1 = 'K1 =d= tau \ 'kr1 . { 'K1} + ( ('kw1 \ tau . { 'K1}) +  ('kw2 \ tau . { 'K2 })) .
+    eq K2 = 'K2 =d= tau \ 'kr2 . { 'K2} + ( ('kw1 \ tau . { 'K1}) +  ('kw2 \ tau . { 'K2 })) .
+    
+    op P1 :  -> SDefinition .
+    op P11 :  -> SDefinition .
+    op P12 :  -> SDefinition .
+    eq P1 = 'P1 =d= tau \ 'b1wt . tau \ 'kw2 . { 'P11} .
+    eq P11 = 'P11 =d= 'b2rf \ tau . { 'P12} + 'b2rt \ tau . (( 'kr2 \ tau . { 'P11} ) +  ('kr1 \ tau . { 'P12})) .
+    eq P12 = 'P12 =d= 'enter1 \ tau . 'exit1 \ tau . tau \ 'b1wf . { 'P1} .
+    op P2 :  -> SDefinition .
+    op P21 :  -> SDefinition .
+    op P22 :  -> SDefinition .
+    eq P2 = 'P2 =d= tau \ 'b2wt . tau \ 'kw1 . { 'P21} .
+    eq P21 = 'P21 =d= 'b1rf \ tau . { 'P22} + 'b1rt \ tau . (( 'kr1 \ tau . { 'P21} ) +  ('kr2 \ tau . { 'P22})) .
+    eq P22 = 'P22 =d= 'enter2 \ tau . 'exit2 \ tau . tau \ 'b2wf . { 'P2} .
+    op Peterson : -> Process .
+    eq Peterson = ['b1rf, 'b1rt, 'b1wf, 'b1wt, 'b2rf, 'b2rt, 'b2wf, 'b2wt, 'kr1, 'kr2, 'kw1, 'kw2 ] { 'P1} | ( { 'P2} | ({ 'B1f} | ({ 'B2f} | { 'K1})) ) .
+    op Def : -> SDefinition .
+    eq Def = BT1 , BF1 , BT2 , BF2 , K1 , K2 , P1 , P11 , P12 , P2 , P21 , P22 .
+endm
+
+--- rew  generateDot(Peterson, Def) .
+--- deadlock free
+search  st(Peterson @ Def) =>! X:State .
+--- Model Checking (Critical Section)
+search st( Peterson @  Def ) =>* S:st such that not (S:st |= ([[ 'exit1 \ tau ]] ff) OR ([[ 'exit2 \ tau ]] ff)) .
+--- red modelCheck( Peterson ,  Def , []  ( ([[ 'exit1 \ tau ]] ff) OR ([[ 'exit2 \ tau ]] ff))) .
