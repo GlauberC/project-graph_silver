@@ -1,6 +1,13 @@
 <?php
     //Read command from index.html text
-    $COMMAND = $_GET["txt"];
+    $input = $_GET["txt"];
+    $array_input = explode(";", $input);
+    $select = array();
+    for($i = 0; $i < count($array_input) ; $i++){
+        $options = explode("=", $array_input[$i]);
+        $select[$i] = $options[0];
+    }
+    $COMMAND = "red generateDot( { ".$select[0] ."} , (" . implode(" , " ,$array_input) . ") ) .";
     
     //Maude's directory
     $DIR_MAUDE = "/usr/bin/maude";  //<- YOU MUST CHANGE HERE
