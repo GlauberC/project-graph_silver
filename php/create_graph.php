@@ -8,7 +8,7 @@
         $select[$i] = $options[0];
     }
     $COMMAND = "red generateDot( { ".$select[0] ."} , (" . implode(" , " ,$array_input) . ") ) .";
-    
+
     //Maude's directory
     $DIR_MAUDE = "/usr/bin/maude";  //<- YOU MUST CHANGE HERE
     $DIR_FILE_MAUDE = "/opt/lampp/htdocs/project-graph_silver/data/semantics.maude";    //<- YOU MUST CHANGE HERE
@@ -17,6 +17,14 @@
     //It runs the SiLVer on Maude from maude-silver-run.php File
     require_once ("maude-silver-run.php");
     $file_name = createFile($COMMAND, $DIR_MAUDE, $DIR_FILE_MAUDE, $MODF);
+    
+    //Add the list of options
+    //echo "<select class='selectpicker' input='$input' onchange='showGraph()'>";
+    echo "<select class='selectpicker' input='$input'>";
+    for($i = 0; $i < count($select); $i++){
+        echo "<option>$select[$i]</option>";
+    }
+    echo "</select>";
 
     //It creates body of graph
     echo "<div id='graph-container' dir='$file_name'>

@@ -4,12 +4,13 @@ $(document).ready(function () {
 
     $("li#explore").click(function () {
         $("input#submitHide").click();
+        
     })
 });
-// /Hide
+
 
 //  === Ajax, send from textarea to Maude command Function ===
-function showGraph() {
+function showGraphExplore() {
     // Getting the input from the user
     var txt = $("textarea")[0].value
     // The Ajax invocation
@@ -29,7 +30,14 @@ function showGraph() {
     xhttp.send();
 
 }
-// /ajax
+
+
+function showGraphChange(){
+    //pick select text
+    //remove current graph
+    //pick filename
+    //create a new graph
+}
 
 //  ===Create Graph ===
 function graph() {
@@ -99,7 +107,6 @@ function graph() {
     //It reads the Json filename from output
     d3.json($fileName, function (error, graph) {
         if (error) throw error;
-        console.log("OK");
         update(graph.links, graph.nodes);
     })
 
