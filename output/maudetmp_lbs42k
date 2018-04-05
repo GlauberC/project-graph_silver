@@ -1,1 +1,0 @@
-{    "nodes": [{"id":"A","group":1},{"id":"B","group":2},{"id":"t / t.A","group":3}  ],    "links": [{"source":"A","target":"A","type":"x / y"},{"source":"B","target":"t / t.A","type":"w / w"},{"source":"t / t.A","target":"A","type":"t / t"}  ]}
