@@ -25,7 +25,7 @@ function showGraphExplore() {
         }
     };
     // Note that the URL is create_graph.php and I use "?txt" to send the needed parameter (the input from the user)
-    xhttp.open("GET", "php/create_graph.php?txt=" + txt, true);
+    xhttp.open("GET", "php/create_graph.php?txt=" + encodeURIComponent(txt), true);
     // Calling create_graph.php
     xhttp.send();
 
