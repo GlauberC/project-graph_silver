@@ -12,6 +12,7 @@ $(document).ready(function () {
 function showGraph(type, self) {
     // Getting the input from the user
     var txt = $("textarea")[0].value;
+    txt = txt.replace("\n", ";");
         if(type != "EXPLORE"){
             txt = "REFRESH=>" + $(self).text() + '=>' + txt;
         }else{

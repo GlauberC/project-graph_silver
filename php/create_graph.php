@@ -42,7 +42,9 @@
             for($i = 0; $i < count($select); $i++){
                 if(strcmp($select[$i], $select_active) != 0){
                     echo "<li onclick='showGraph(0 ,this)'><a href='#'>$select[$i]</a></li>";
-                }  
+                }else{
+                    echo "<li class = 'disabled'><a href='#'>$select[$i]</a></li>";
+                }
             }
             echo "</ul>
         </div>";
