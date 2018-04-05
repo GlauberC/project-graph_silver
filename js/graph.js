@@ -11,8 +11,10 @@ $(document).ready(function () {
 //  === Ajax, send from textarea to Maude command Function ===
 function showGraph(type, self) {
     // Getting the input from the user
-    var txt = $("textarea")[0].value;
-    txt = txt.replace("\n", ";");
+    var txt = $("textarea").val();
+    txt = txt.trim();
+    txt = txt.replace(/\n/g, ';');
+
         if(type != "EXPLORE"){
             txt = "REFRESH=>" + $(self).text() + '=>' + txt;
         }else{

@@ -16,24 +16,14 @@
 
     //Maude's directory
     $DIR_MAUDE = "/usr/bin/maude";  //<- YOU MUST CHANGE HERE
-    $DIR_FILE_MAUDE = "/opt/lampp/htdocs/project-graph_silver/data/semantics.maude";    //<- YOU MUST CHANGE HERE
+    $DIR_FILE_MAUDE = "../data/semantics.maude";
     $MODF = "-no-banner";
 
     //It runs the SiLVer on Maude from maude-silver-run.php File
     require_once ("maude-silver-run.php");
     $file_name = createFile($COMMAND, $DIR_MAUDE, $DIR_FILE_MAUDE, $MODF);
-    //Add the list of options
-    /*
-    echo "<select onchange='showGraph()'>";
-    echo "<option>$select_active</option>";
-    for($i = 0; $i < count($select); $i++){
-        if(strcmp($select[$i], $select_active) != 0){
-            echo "<option>$select[$i]</option>";
-        }
-        
-    }
-    echo "</select>";
-    */
+    //Add the list of options with dropmenu
+
     echo "<div class='dropdown'>
         <button class='btn btn-default dropdown-toggle' type='button' data-toggle='dropdown'>$select_active
         <span class='caret'></span></button>

@@ -7,12 +7,19 @@ Version history:
 
  v 4.x
     
+    4.4  
+        It was changed the SiLVer's directory
+        It was created a placeholder on text area;  
+        Now it's no need ; after each line;  
+        It was changed select option to dropmenu from bootstrap;  
+        It changed on xhttp.open txt to encodeURIComponent(txt);  
+        It was fixed the select options to refresh a new graph;  
     4.3  
-        Better organization of files in folders  
-        It was written comments in all files  
-        Maude files added on data directory  
+        Better organization of files in folders;  
+        It was written comments in all files;  
+        Maude files added on data directory;  
     4.2  
-        Added click function to create a highlight on node.    
+        Added click function to create a highlight on node;    
     4.1.3  
         Some adjustments on graph's physics;    
         Added border on graph;  
