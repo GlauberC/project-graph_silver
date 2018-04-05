@@ -23,6 +23,7 @@
     require_once ("maude-silver-run.php");
     $file_name = createFile($COMMAND, $DIR_MAUDE, $DIR_FILE_MAUDE, $MODF);
     //Add the list of options
+    /*
     echo "<select onchange='showGraph()'>";
     echo "<option>$select_active</option>";
     for($i = 0; $i < count($select); $i++){
@@ -32,7 +33,19 @@
         
     }
     echo "</select>";
+    */
+    echo "<div class='dropdown'>
+        <button class='btn btn-default dropdown-toggle' type='button' data-toggle='dropdown'>$select_active
+        <span class='caret'></span></button>
+            <ul class='dropdown-menu'>";
 
+            for($i = 0; $i < count($select); $i++){
+                if(strcmp($select[$i], $select_active) != 0){
+                    echo "<li onclick='showGraph(0 ,this)'><a href='#'>$select[$i]</a></li>";
+                }  
+            }
+            echo "</ul>
+        </div>";
     //It creates body of graph
     echo "<div id='graph-container' dir='$file_name'>
     

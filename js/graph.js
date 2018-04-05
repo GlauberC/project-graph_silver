@@ -3,24 +3,20 @@ $(document).ready(function () {
     $("input#submitHide").hide();
 
     $("li#explore").click(function () {
-        $("input#submitHide").click();
-        
+        $("input#submitHide").click(); 
     })
 });
 
 
 //  === Ajax, send from textarea to Maude command Function ===
-function showGraph(type) {
-
+function showGraph(type, self) {
     // Getting the input from the user
-    var txt = $("textarea")[0].value
+    var txt = $("textarea")[0].value;
         if(type != "EXPLORE"){
-            $("select option:selected").each(function(){
-            txt = "REFRESH=>" + $(this).text() + '=>' + txt;
-        })}else{
+            txt = "REFRESH=>" + $(self).text() + '=>' + txt;
+        }else{
             txt = "EXPLORE=>" + "FIRST" + '=>' + txt;
-        }
-        ;
+        };
 
     // The Ajax invocation
     var xhttp = new XMLHttpRequest();
