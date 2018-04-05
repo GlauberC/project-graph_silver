@@ -10,9 +10,18 @@ $(document).ready(function () {
 
 
 //  === Ajax, send from textarea to Maude command Function ===
-function showGraphExplore() {
+function showGraph(type) {
+
     // Getting the input from the user
     var txt = $("textarea")[0].value
+        if(type != "EXPLORE"){
+            $("select option:selected").each(function(){
+            txt = "REFRESH=>" + $(this).text() + '=>' + txt;
+        })}else{
+            txt = "EXPLORE=>" + "FIRST" + '=>' + txt;
+        }
+        ;
+
     // The Ajax invocation
     var xhttp = new XMLHttpRequest();
 
@@ -30,14 +39,30 @@ function showGraphExplore() {
     xhttp.send();
 
 }
+//  === Ajax, send from select option to Maude command Function ===
+function refreshGraph(){
+    
+    $("select option:selected").each(function(){
+        var txt = $(this).text() + '=>' + $("textarea")[0].value;
+        var xhttp = new XMLHttpRequest();
 
 
-function showGraphChange(){
-    //pick select text
-    //remove current graph
-    //pick filename
-    //create a new graph
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                // When create_graph.php finishes, we can recover its output by using the responseText field
+                // I used the content of create_graph.php to update the text "graph_txt"
+                $("div#graph_txt")[0].innerHTML = this.responseText;
+                //graph();
+            }
+        };
+        // Note that the URL is create_graph.php and I use "?txt" to send the needed parameter (the input from the user)
+        xhttp.open("GET", "php/refresh_graph.php?txt=" + encodeURIComponent(txt), true);
+        // Calling create_graph.php
+        xhttp.send();
+        
+    });
 }
+
 
 //  ===Create Graph ===
 function graph() {
