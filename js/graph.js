@@ -68,9 +68,9 @@ function graph() {
     //It creates three sizes based on screenswidth
     //          [>1100px, >600px, <=600px]
     widthSize = [300, 400, 800];
-    heightSize = [200, 200, 300];
+    heightSize = [300, 400, 500];
     nodeRadius = [8, 10, 12]; //Node's radius
-    MarkrefX = [17, 20, 22 ]; //Proximity of the arrows to nodes
+    MarkrefX = [15, 17, 20 ]; //Proximity of the arrows to nodes
 
     //It return de 0,1 or 2 based on width size
     function windowSizeCalculation(width){
@@ -123,10 +123,10 @@ function graph() {
 
     //It creates physics on graph
     var simulation = d3.forceSimulation()
-        .force("link", d3.forceLink().id(function (d) {return d.id;}).distance(100).strength(0.5))
+        .force("link", d3.forceLink().id(function (d) {return d.id;}).distance(150).strength(0.5))
         .force("charge", d3.forceManyBody().strength(-50)) 
         .force("center", d3.forceCenter(width / 2, height / 2))
-        .force("collision",d3.forceCollide().radius(function(d){return 20;}));
+        .force("collision",d3.forceCollide().radius(function(d){return 50;}));
 
     //It reads the Json filename from output
     d3.json($fileName, function (error, graph) {
@@ -167,8 +167,8 @@ function graph() {
             .attrs({
                 'class': 'edgelabel',
                 'id': function (d, i) { return 'edgelabel' + i },
-                'font-size': 11,
-                'fill': 'rgba(175, 175, 174, 0.9)'
+                'font-size': 14,
+                'fill': 'rgba(175, 175, 174, 0.5)'
             });
         edgelabels.append('textPath')
             .attr('xlink:href', function (d, i) { return '#edgepath' + i })
@@ -256,26 +256,19 @@ function graph() {
                 pY[0] = d.source.y;
                 pX[17] = d.target.x;
                 pY[17] = d.target.y;
-
+                    //    1    2    3    4    5    6    7    8    9   10    11   12   13   14   15   16
+                //selfX = [4,   7,   10,   12,  13,  13,  12,  10,   8,   5,  2,  -1,  -2,   -3, -3, -2,];
+                //selfY = [-1, -1,   -3,  -5,   -8, -11, -14, -16, -17, -17.5, -17, -15, -12,  -10, -8, -8,];
+                selfX = [0.15, 0.25, 0.3, 0.25, 0.15, 0, -0.2, -0.4, -0.55, -0.65, -0.7, -0.65, -0.6, -0.6, -0.5, -0.4];
+                selfY = [-0.1, -0.25, -0.45, -0.65, -0.8, -0.9, -0.95, -0.9, -0.8, -0.65, -0.45, -0.25, -0.15, -0.15, -0.05, 0];
+                size = nodeRadius[winSize] * 3.3;
                 //Self link
+                
                 if (d.source.id == d.target.id) {
-                    pX[1] = d.source.x + 2.5; pY[1] = d.source.y - 0;
-                    pX[2] = d.source.x + 7.5; pY[2] = d.source.y - 2.5;
-                    pX[3] = d.source.x + 10; pY[3] = d.source.y - 5;
-                    pX[4] = d.source.x + 12.5; pY[4] = d.source.y - 10;
-                    pX[5] = d.source.x + 12.5; pY[5] = d.source.y - 15;
-                    pX[6] = d.source.x + 10; pY[6] = d.source.y - 20;
-                    pX[7] = d.source.x + 7.5; pY[7] = d.source.y - 22.5;
-                    pX[8] = d.source.x + 2.5; pY[8] = d.source.y - 25;
-                    pX[9] = d.source.x - 2.5; pY[9] = d.source.y - 25;
-                    pX[10] = d.source.x - 7.5; pY[10] = d.source.y - 22.5;
-                    pX[11] = d.source.x - 10; pY[11] = d.source.y - 20;
-                    pX[12] = d.source.x - 12.5; pY[12] = d.source.y - 15;
-                    pX[13] = d.source.x - 12.5; pY[13] = d.source.y - 12;
-                    pX[14] = d.source.x - 10; pY[14] = d.source.y - 10;
-                    pX[15] = d.source.x - 10; pY[15] = d.source.y - 10;
-                    pX[16] = d.source.x - 10; pY[16] = d.source.y - 10;
-
+                    for(i =1; i<17; i++ ){
+                        pX[i] = d.source.x + selfX[i-1] * size; 
+                        pY[i] = d.source.y + selfY[i-1] * size;
+                    }
 
                 } else {
                     for (var i in allLinks) {
@@ -284,8 +277,17 @@ function graph() {
                             if (allLinks[i].target.id == d.source.id) {
                                 if (d.source.id < d.target.id) {
                                     bothLink = true;
-                                    pY[17] = d.target.y - 4;
-                                    pX[17] = d.target.x - 4;
+                                    if(d.source.x >= d.target.x && d.source.y >= d.target.y){
+                                        pY[17] = d.target.y + 6;
+                                        pX[17] = d.target.x;
+                                    }else if(d.source.x <= d.target.x && d.source.y <= d.target.y){
+                                        pY[17] = d.target.y - 6;
+                                        pX[17] = d.target.x;
+                                    }else{
+                                        pY[17] = d.target.y + 6;
+                                        pX[17] = d.target.x + 6;     
+                                    }
+
                                 }
 
                             }
@@ -297,8 +299,17 @@ function graph() {
                             pY[z] = d.source.y;
                             pX[z] = d.source.x;
                         } else {
-                            pY[z] = d.source.y - 4;
-                            pX[z] = d.source.x - 4;
+                            if(d.source.x >= d.target.x && d.source.y >= d.target.y){
+
+                                pY[z] = d.source.y + 6;
+                                pX[z] = d.source.x;
+                            }else if(d.source.x <= d.target.x && d.source.y <= d.target.y){
+                                pY[z] = d.source.y - 6;
+                                pX[z] = d.source.x;
+                            }else{
+                                pY[z] = d.source.y + 6;
+                                pX[z] = d.source.x + 6;  
+                            }
                         }
 
                     }
@@ -386,6 +397,7 @@ function graph() {
         d.fx = null;
         d.fy = null;
     }
+
 }
 // /graph
 graph

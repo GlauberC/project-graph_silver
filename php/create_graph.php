@@ -62,7 +62,7 @@
 <head>
     <style type="text/css">
 
-        .link {stroke: rgba(0, 0, 0, .8); stroke-opacity: .4; stroke-width: 1.2px;}
+        .link {stroke: rgba(0, 0, 0, .8); stroke-opacity: .4; stroke-width: 1.6px;}
         div#info-node-link{
             margin: 2em;
         }
