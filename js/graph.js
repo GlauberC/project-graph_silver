@@ -68,7 +68,7 @@ function graph() {
     //It creates three sizes based on screenswidth
     //          [>1100px, >600px, <=600px]
     widthSize = [300, 400, 800];
-    heightSize = [300, 400, 500];
+    heightSize = [250, 350, 450];
     nodeRadius = [8, 10, 12]; //Node's radius
     MarkrefX = [15, 17, 20 ]; //Proximity of the arrows to nodes
 
