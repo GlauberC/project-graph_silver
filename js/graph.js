@@ -10,6 +10,7 @@ $(document).ready(function () {
 
 //  === Ajax, send from textarea to Maude command Function ===
 function showGraph(type, self) {
+    $("#graph_txt").html("<div class='loader'></div>");
     // Getting the input from the user
     var txt = $("textarea").val();
     txt = txt.trim();
