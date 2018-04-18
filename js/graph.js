@@ -7,14 +7,21 @@ $(document).ready(function () {
     })
 });
 
+function stringManipulation(string){
+    string = string.trim();
+    string = string.replace(/\n/g, ';');
+    string = string.replace(/([a-z]\w+)/ig , "\'$1");
+    string = string.replace(/\'(tau)/g , "$1");
+    return string;
+}
 
 //  === Ajax, send from textarea to Maude command Function ===
 function showGraph(type, self) {
     $("#graph_txt").html("<div class='loader'></div>");
     // Getting the input from the user
     var txt = $("textarea").val();
-    txt = txt.trim();
-    txt = txt.replace(/\n/g, ';');
+    txt = stringManipulation(txt);
+    
 
         if(type != "EXPLORE"){
             txt = "REFRESH=>" + $(self).text() + '=>' + txt;
