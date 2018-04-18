@@ -20,7 +20,9 @@ function stringManipulation(string) {
     string = string.replace(/#.+\n/ig, "");                 //remove comments
     string = string.replace(/\n#.+/ig, "");                 //remove if ending with comment
     string = string.replace(/\n/g, ';');                    //replace \n to ;
-    string = string.replace(/([a-z]\w+)/ig, "\'$1");        //add ' before process
+
+    string = string.replace(/([a-z]\w*\s*)/ig, "\'$1");     //add ' before process 
+    string = string.replace(/\'(d\=)/ig, "$1");             //remove ' from ='d=
     string = string.replace(/\'(tau)/g, "$1");              //remove ' from tau special char
     return string;
 }
@@ -28,13 +30,15 @@ function stringManipulation(string) {
 //  === Ajax, send from textarea to Maude command Function ===
 function showGraph(type, self) {
     $("#graph_txt").html("<div class='loader'></div>");
+    
     // Getting the input from the user
     var txt = $("textarea").val();
     txt = stringManipulation(txt);
+    console.log(txt);
 
 
     if (type != "EXPLORE") {
-        txt = "REFRESH=>" + $(self).text().replace((/([a-z]\w+)/i), "\'$1") + '=>' + txt;
+        txt = "REFRESH=>" + $(self).text().replace(/([a-z]\w*\s*)/ig, "\'$1") + '=>' + txt;
     } else {
         txt = "EXPLORE=>" + "FIRST" + '=>' + txt;
     };
