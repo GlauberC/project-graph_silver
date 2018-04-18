@@ -23,19 +23,20 @@
     require_once ("maude-silver-run.php");
     $file_name = createFile($COMMAND, $DIR_MAUDE, $DIR_FILE_MAUDE, $MODF);
     //Add the list of options with dropmenu
-
+    $process_active = str_replace("'","",$select_active);
     echo "
             <div class='graph-interface'>
             <div class='dropdown'>
-                    <button class='btn btn-default dropdown-toggle' type='button' data-toggle='dropdown'>$select_active
+                    <button class='btn btn-default dropdown-toggle' type='button' data-toggle='dropdown'>$process_active
                     <span class='caret'></span></button>
                         <ul class='dropdown-menu dropdown-scrollable'>";
 
                         for($i = 0; $i < count($select); $i++){
+                            $process_select = str_replace("'","",$select[$i]);
                             if(strcmp($select[$i], $select_active) != 0){
-                                echo "<li onclick='showGraph(0 ,this)'><a href='#'>$select[$i]</a></li>";
+                                echo "<li onclick='showGraph(0 ,this)'><a href='#'>$process_select</a></li>";
                             }else{
-                                echo "<li class = 'disabled'><a href='#'>$select[$i]</a></li>";
+                                echo "<li class = 'disabled'><a href='#'>$process_select</a></li>";
                             }
                         }
                         echo "</ul>

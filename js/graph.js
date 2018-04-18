@@ -24,7 +24,7 @@ function showGraph(type, self) {
     
 
         if(type != "EXPLORE"){
-            txt = "REFRESH=>" + $(self).text() + '=>' + txt;
+            txt = "REFRESH=>" + $(self).text().replace((/([a-z]\w+)/i),"\'$1") + '=>' + txt;
         }else{
             txt = "EXPLORE=>" + "FIRST" + '=>' + txt;
         };
