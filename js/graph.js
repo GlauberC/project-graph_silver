@@ -1,18 +1,27 @@
+
+
+$(function () {
+    $(".lined").linedtextarea(
+        { selectedLine: 1 }
+    );
+});
+
 //  === Hide submit buton and nav integration ===
 $(document).ready(function () {
     $("input#submitHide").hide();
 
     $("li#explore").click(function () {
-        $("input#submitHide").click(); 
+        $("input#submitHide").click();
     })
 });
 
-function stringManipulation(string){
+function stringManipulation(string) {
     string = string.trim();
-    string = string.replace(/#.+\n/ig, "");                //remove comments
-    string = string.replace(/\n/g, ';');                //replace \n to ;
-    string = string.replace(/([a-z]\w+)/ig , "\'$1");   //add ' before process
-    string = string.replace(/\'(tau)/g , "$1");         //remove ' from tau special char
+    string = string.replace(/#.+\n/ig, "");                 //remove comments
+    string = string.replace(/\n#.+/ig, "");                 //remove if ending with comment
+    string = string.replace(/\n/g, ';');                    //replace \n to ;
+    string = string.replace(/([a-z]\w+)/ig, "\'$1");        //add ' before process
+    string = string.replace(/\'(tau)/g, "$1");              //remove ' from tau special char
     return string;
 }
 
@@ -22,13 +31,13 @@ function showGraph(type, self) {
     // Getting the input from the user
     var txt = $("textarea").val();
     txt = stringManipulation(txt);
-    
 
-        if(type != "EXPLORE"){
-            txt = "REFRESH=>" + $(self).text().replace((/([a-z]\w+)/i),"\'$1") + '=>' + txt;
-        }else{
-            txt = "EXPLORE=>" + "FIRST" + '=>' + txt;
-        };
+
+    if (type != "EXPLORE") {
+        txt = "REFRESH=>" + $(self).text().replace((/([a-z]\w+)/i), "\'$1") + '=>' + txt;
+    } else {
+        txt = "EXPLORE=>" + "FIRST" + '=>' + txt;
+    };
 
     // The Ajax invocation
     var xhttp = new XMLHttpRequest();
@@ -48,9 +57,9 @@ function showGraph(type, self) {
 
 }
 //  === Ajax, send from select option to Maude command Function ===
-function refreshGraph(){
-    
-    $("select option:selected").each(function(){
+function refreshGraph() {
+
+    $("select option:selected").each(function () {
         var txt = $(this).text() + '=>' + $("textarea")[0].value;
         var xhttp = new XMLHttpRequest();
 
@@ -67,7 +76,7 @@ function refreshGraph(){
         xhttp.open("GET", "php/refresh_graph.php?txt=" + encodeURIComponent(txt), true);
         // Calling create_graph.php
         xhttp.send();
-        
+
     });
 }
 
@@ -79,21 +88,21 @@ function graph() {
     widthSize = [300, 400, 800];
     heightSize = [250, 350, 450];
     nodeRadius = [8, 10, 12]; //Node's radius
-    MarkrefX = [15, 17, 20 ]; //Proximity of the arrows to nodes
+    MarkrefX = [15, 17, 20]; //Proximity of the arrows to nodes
 
     //It return de 0,1 or 2 based on width size
-    function windowSizeCalculation(width){
-        if (width > 1100){
+    function windowSizeCalculation(width) {
+        if (width > 1100) {
             return 2;
-        }else if(width > 600){
+        } else if (width > 600) {
             return 1;
-        }else {
+        } else {
             return 0;
         }
     }
     //It gets the Window size and return a number 0,1 or 2.
     winSize = windowSizeCalculation(window.innerWidth);
-    
+
     //It defines the graph size
     var width = widthSize[winSize];
     var height = heightSize[winSize];
@@ -104,8 +113,8 @@ function graph() {
 
     //It addes the graph window
     $("div#graph-container").append("<svg width='" + width + "'height='" + height + "'></svg>");
-    
-//It starts Force-Directed Graph
+
+    //It starts Force-Directed Graph
     //It creates Window
     var colors = d3.scaleOrdinal(d3.schemeCategory10);
     var svg = d3.select("svg"),
@@ -132,10 +141,10 @@ function graph() {
 
     //It creates physics on graph
     var simulation = d3.forceSimulation()
-        .force("link", d3.forceLink().id(function (d) {return d.id;}).distance(150).strength(0.5))
-        .force("charge", d3.forceManyBody().strength(-50)) 
+        .force("link", d3.forceLink().id(function (d) { return d.id; }).distance(150).strength(0.5))
+        .force("charge", d3.forceManyBody().strength(-50))
         .force("center", d3.forceCenter(width / 2, height / 2))
-        .force("collision",d3.forceCollide().radius(function(d){return 50;}));
+        .force("collision", d3.forceCollide().radius(function (d) { return 50; }));
 
     //It reads the Json filename from output
     d3.json($fileName, function (error, graph) {
@@ -238,10 +247,10 @@ function graph() {
                     return neighboring(d, o) | neighboring(o, d) ? 1 : 0.1;
                 });
                 link.style("opacity", function (o) {
-                    return d.index==o.source.index | d.index==o.target.index ? 1 : 0.1;
+                    return d.index == o.source.index | d.index == o.target.index ? 1 : 0.1;
                 });
                 edgelabels.style("opacity", function (o) {
-                    return d.index==o.source.index | d.index==o.target.index ? 1 : 0.1;
+                    return d.index == o.source.index | d.index == o.target.index ? 1 : 0.1;
                 });
                 //Reduce the op
                 toggle = 1;
@@ -252,7 +261,7 @@ function graph() {
                 edgelabels.style("opacity", 1);
                 toggle = 0;
             }
-        }       
+        }
     }
     function ticked() {
         //Position of links
@@ -265,18 +274,18 @@ function graph() {
                 pY[0] = d.source.y;
                 pX[17] = d.target.x;
                 pY[17] = d.target.y;
-                    //    1    2    3    4    5    6    7    8    9   10    11   12   13   14   15   16
+                //    1    2    3    4    5    6    7    8    9   10    11   12   13   14   15   16
                 //selfX = [4,   7,   10,   12,  13,  13,  12,  10,   8,   5,  2,  -1,  -2,   -3, -3, -2,];
                 //selfY = [-1, -1,   -3,  -5,   -8, -11, -14, -16, -17, -17.5, -17, -15, -12,  -10, -8, -8,];
                 selfX = [0.15, 0.25, 0.3, 0.25, 0.15, 0, -0.2, -0.4, -0.55, -0.65, -0.7, -0.65, -0.6, -0.6, -0.5, -0.4];
                 selfY = [-0.1, -0.25, -0.45, -0.65, -0.8, -0.9, -0.95, -0.9, -0.8, -0.65, -0.45, -0.25, -0.15, -0.15, -0.05, 0];
                 size = nodeRadius[winSize] * 3.3;
                 //Self link
-                
+
                 if (d.source.id == d.target.id) {
-                    for(i =1; i<17; i++ ){
-                        pX[i] = d.source.x + selfX[i-1] * size; 
-                        pY[i] = d.source.y + selfY[i-1] * size;
+                    for (i = 1; i < 17; i++) {
+                        pX[i] = d.source.x + selfX[i - 1] * size;
+                        pY[i] = d.source.y + selfY[i - 1] * size;
                     }
 
                 } else {
@@ -286,15 +295,15 @@ function graph() {
                             if (allLinks[i].target.id == d.source.id) {
                                 if (d.source.id < d.target.id) {
                                     bothLink = true;
-                                    if(d.source.x >= d.target.x && d.source.y >= d.target.y){
+                                    if (d.source.x >= d.target.x && d.source.y >= d.target.y) {
                                         pY[17] = d.target.y + 6;
                                         pX[17] = d.target.x;
-                                    }else if(d.source.x <= d.target.x && d.source.y <= d.target.y){
+                                    } else if (d.source.x <= d.target.x && d.source.y <= d.target.y) {
                                         pY[17] = d.target.y - 6;
                                         pX[17] = d.target.x;
-                                    }else{
+                                    } else {
                                         pY[17] = d.target.y + 6;
-                                        pX[17] = d.target.x + 6;     
+                                        pX[17] = d.target.x + 6;
                                     }
 
                                 }
@@ -308,16 +317,16 @@ function graph() {
                             pY[z] = d.source.y;
                             pX[z] = d.source.x;
                         } else {
-                            if(d.source.x >= d.target.x && d.source.y >= d.target.y){
+                            if (d.source.x >= d.target.x && d.source.y >= d.target.y) {
 
                                 pY[z] = d.source.y + 6;
                                 pX[z] = d.source.x;
-                            }else if(d.source.x <= d.target.x && d.source.y <= d.target.y){
+                            } else if (d.source.x <= d.target.x && d.source.y <= d.target.y) {
                                 pY[z] = d.source.y - 6;
                                 pX[z] = d.source.x;
-                            }else{
+                            } else {
                                 pY[z] = d.source.y + 6;
-                                pX[z] = d.source.x + 6;  
+                                pX[z] = d.source.x + 6;
                             }
                         }
 
@@ -407,6 +416,106 @@ function graph() {
         d.fy = null;
     }
 
-}
-// /graph
-graph
+}// /graph
+
+
+///* Textarea line. Found on  http://alan.blog-city.com/jquerylinedtextarea.htm*/
+(function ($) {
+
+    $.fn.linedtextarea = function (options) {
+
+        // Get the Options
+        var opts = $.extend({}, $.fn.linedtextarea.defaults, options);
+
+
+		/*
+		 * Helper function to make sure the line numbers are always
+		 * kept up to the current system
+		 */
+        var fillOutLines = function (codeLines, h, lineNo) {
+            while ((codeLines.height() - h) <= 0) {
+                if (lineNo == opts.selectedLine)
+                    codeLines.append("<div class='lineno lineselect'>" + lineNo + "</div>");
+                else
+                    codeLines.append("<div class='lineno'>" + lineNo + "</div>");
+
+                lineNo++;
+            }
+            return lineNo;
+        };
+
+
+		/*
+		 * Iterate through each of the elements are to be applied to
+		 */
+        return this.each(function () {
+            var lineNo = 1;
+            var textarea = $(this);
+
+            /* Turn off the wrapping of as we don't want to screw up the line numbers */
+            textarea.attr("wrap", "off");
+            textarea.css({ resize: 'none' });
+            var originalTextAreaWidth = textarea.outerWidth();
+
+            /* Wrap the text area in the elements we need */
+            textarea.wrap("<div class='linedtextarea' style = 'width:60vw;height: 30vh;'></div>");
+            var linedTextAreaDiv = textarea.parent().wrap("<div class='linedwrap' style='width:" + originalTextAreaWidth + "px'></div>");
+            var linedWrapDiv = linedTextAreaDiv.parent();
+
+            linedWrapDiv.prepend("<div class='lines' style='width:50px'></div>");
+
+            var linesDiv = linedWrapDiv.find(".lines");
+            linesDiv.height(textarea.height() + 6);
+
+
+            /* Draw the number bar; filling it out where necessary */
+            linesDiv.append("<div class='codelines'></div>");
+            var codeLinesDiv = linesDiv.find(".codelines");
+            lineNo = fillOutLines(codeLinesDiv, linesDiv.height(), 1);
+
+            /* Move the textarea to the selected line */
+            if (opts.selectedLine != -1 && !isNaN(opts.selectedLine)) {
+                var fontSize = parseInt(textarea.height() / (lineNo - 2));
+                var position = parseInt(fontSize * opts.selectedLine) - (textarea.height() / 2);
+                textarea[0].scrollTop = position;
+            }
+
+
+            /* Set the width */
+            var sidebarWidth = linesDiv.outerWidth();
+            var paddingHorizontal = parseInt(linedWrapDiv.css("border-left-width")) + parseInt(linedWrapDiv.css("border-right-width")) + parseInt(linedWrapDiv.css("padding-left")) + parseInt(linedWrapDiv.css("padding-right"));
+            var linedWrapDivNewWidth = originalTextAreaWidth - paddingHorizontal;
+            var textareaNewWidth = originalTextAreaWidth - sidebarWidth - paddingHorizontal - 20;
+
+            textarea.width(textareaNewWidth);
+            linedWrapDiv.width(linedWrapDivNewWidth);
+
+
+
+            /* React to the scroll event */
+            textarea.scroll(function (tn) {
+                var domTextArea = $(this)[0];
+                var scrollTop = domTextArea.scrollTop;
+                var clientHeight = domTextArea.clientHeight;
+                codeLinesDiv.css({ 'margin-top': (-1 * scrollTop) + "px" });
+                lineNo = fillOutLines(codeLinesDiv, scrollTop + clientHeight, lineNo);
+            });
+
+
+            /* Should the textarea get resized outside of our control */
+            textarea.resize(function (tn) {
+                var domTextArea = $(this)[0];
+                linesDiv.height(domTextArea.clientHeight + 6);
+            });
+
+        });
+    };
+
+    // default options
+    $.fn.linedtextarea.defaults = {
+        selectedLine: -1,
+        selectedClass: 'lineselect'
+    };
+})(jQuery);
+
+//close textarea line
