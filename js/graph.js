@@ -1,3 +1,6 @@
+    
+    
+
 
 
 $(function () {
@@ -23,7 +26,6 @@ function stringManipulation(string) {
     string = string.replace(/([a-z]\w*)/ig, " \'$1 ");      //add ' before process 
     string = string.replace(/\'(tau)/g, "$1");              //remove ' from tau special char
     string = string.replace(/=/ig, " =d= ");                //replace = to =d=
-    console.log(string);
     return string;
 }
 
@@ -34,7 +36,6 @@ function showGraph(type, self) {
     // Getting the input from the user
     var txt = $("textarea").val();
     txt = stringManipulation(txt);
-    //console.log(txt);
 
 
     if (type != "EXPLORE") {
@@ -87,6 +88,7 @@ function refreshGraph() {
 
 //  ===Create Graph ===
 function graph() {
+    
     //It creates three sizes based on screenswidth
     //          [>1100px, >600px, <=600px]
     widthSize = [300, 400, 800];
@@ -113,7 +115,8 @@ function graph() {
 
     //It gets the Json filename from output
     $fileName = $("div#graph-container").attr("dir");
-
+    //To save the colors
+    var idColors = new Array();
 
     //It addes the graph window
     $("div#graph-container").append("<svg width='" + width + "'height='" + height + "'></svg>");
@@ -214,7 +217,7 @@ function graph() {
             )
         node.append("circle")
             .attr("r", nodeRadius[winSize])
-            .style("fill", function (d, i) { return colors(i); })
+            .style("fill", function (d, i) { idColors[d.id] = colors(i);return idColors[d.id]; })
         node.append("title")
             .text(function (d) { return d.id; });
         node.append("text")
@@ -400,12 +403,12 @@ function graph() {
         $("tbody#target td").remove();
         $("span#node").text(d.id);
         for (var i in allLinks) {
-            //console.log(allLinks[i].colors);
+            var circleColorInfo = "<span style = 'border:1px solid black;border-radius:25px;padding: 0px 10px;background-color: "+idColors[allLinks[i].target.id] + ";'></span>&nbsp;&nbsp;&nbsp;"
             if (allLinks[i].source.id == d.id) {
                 if (allLinks[i].target.id == d.id) {
-                    $("tbody#target").append("<tr><td><small>" + "self" + "</small></td>" + "<td><small>" + allLinks[i].type + "</small></td></tr>");
+                    $("tbody#target").append("<tr><td><small>" +circleColorInfo + "self" + "</small></td>" + "<td><small>" + allLinks[i].type + "</small></td></tr>");
                 } else {
-                    $("tbody#target").append("<tr><td><small>" + allLinks[i].target.id + "</small></td>" + "<td><small>" + allLinks[i].type + "</small></td></tr>");
+                    $("tbody#target").append("<tr><td><small>" + circleColorInfo + allLinks[i].target.id + "</small></td>" + "<td><small>" + allLinks[i].type +"</small></td></tr>");
                 }
 
             }
