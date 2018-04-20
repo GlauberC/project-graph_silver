@@ -20,9 +20,10 @@ function stringManipulation(string) {
     string = string.replace(/#.+\n/ig, "");                 //remove comments
     string = string.replace(/\n#.+/ig, "");                 //remove if ending with comment
     string = string.replace(/\n/g, ';');                    //replace \n to ;
-    string = string.replace(/([a-z]\w*\s*)/ig, "\'$1");     //add ' before process 
+    string = string.replace(/([a-z]\w*)/ig, " \'$1 ");        //add ' before process 
     string = string.replace(/\'(tau)/g, "$1");              //remove ' from tau special char
-    string = string.replace(/=/ig, "=d=");                  //replace = to =d=
+    string = string.replace(/=/ig, " =d= ");                  //replace = to =d=
+    console.log(string);
     return string;
 }
 
@@ -33,7 +34,7 @@ function showGraph(type, self) {
     // Getting the input from the user
     var txt = $("textarea").val();
     txt = stringManipulation(txt);
-    console.log(txt);
+    //console.log(txt);
 
 
     if (type != "EXPLORE") {
