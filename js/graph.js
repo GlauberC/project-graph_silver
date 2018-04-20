@@ -400,6 +400,7 @@ function graph() {
         $("tbody#target td").remove();
         $("span#node").text(d.id);
         for (var i in allLinks) {
+            //console.log(allLinks[i].colors);
             if (allLinks[i].source.id == d.id) {
                 if (allLinks[i].target.id == d.id) {
                     $("tbody#target").append("<tr><td><small>" + "self" + "</small></td>" + "<td><small>" + allLinks[i].type + "</small></td></tr>");

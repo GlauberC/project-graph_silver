@@ -16,7 +16,7 @@
 
     //Maude's directory
     $DIR_MAUDE = "/usr/bin/maude";  //<- YOU MUST CHANGE HERE
-    $DIR_FILE_MAUDE = "../data/semantics.maude";
+    $DIR_FILE_MAUDE = "../system/semantics.maude";
     $MODF = "-no-banner";
 
     //It runs the SiLVer on Maude from maude-silver-run.php File
