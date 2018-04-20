@@ -43,8 +43,12 @@
                         </li>
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
-                        <li><a data-toggle="modal" href="#syntax-modal">Syntax</a></li>
-                        <li><a data-toggle="modal" href="#about-modal">About</a></li>
+                        <li>
+                            <a data-toggle="modal" href="#syntax-modal">Syntax</a>
+                        </li>
+                        <li>
+                            <a data-toggle="modal" href="#about-modal">About</a>
+                        </li>
                     </ul>
                 </div>
                 <!-- /.navbar-collapse -->
@@ -79,10 +83,50 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal">&times;</button>
-                            <h4 class="modal-title">Syntax</h4>
+                            <h4 class="modal-title">Process Network Algebra</h4>
                         </div>
                         <div class="modal-body">
-                            <p>Under Construction.</p>
+                                <h3>Process definitions should start with capital letters and channel names with small letters.</h3>
+                            <table class="table table-condensed">
+                                <thead>
+                                    <th>CNA Expression </th>
+                                    <th>Syntax</th>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Nil Process</td>
+                                        <td>0</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Definition</td>
+                                        <td>A = P</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Link prefix</td>
+                                        <td>a \ b . P</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Guarded Choice</td>
+                                        <td>a \ b . P + c \ d . Q</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Parallel Composition</td>
+                                        <td>P | Q</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Restriction</td>
+                                        <td>[a , b ] P</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Recursion</td>
+                                        <td>{ A }</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Comment</td>
+                                        <td># line of comments</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -105,7 +149,7 @@
             <div id="tab_explore" class="tab-pane fade">
                 <div id="graph_txt">
                     <!-- This is the text that will be updated -->
-                    
+
                 </div>
 
             </div>

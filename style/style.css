@@ -18,6 +18,13 @@ svg{
     overflow-y: scroll;
 }
 
+div.modal-body h3{
+    font-size: 14pt;
+}
+div.modal-body td{
+    font-size: 11pt;
+}
+
 /* loading */
 .loader {
     border: 5px solid #f3f3f3;
