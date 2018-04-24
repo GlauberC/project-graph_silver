@@ -2,7 +2,6 @@
 //Main function
 function createFile($COMMAND, $DIR_MAUDE, $DIR_FILE_MAUDE, $MODF){
     $COMMAND = escapeshellarg($COMMAND);
-
     //Run
     $result =  shell_exec("echo $COMMAND | $DIR_MAUDE $DIR_FILE_MAUDE $MODF 2>&1 ");
 
