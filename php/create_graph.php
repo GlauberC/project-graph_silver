@@ -1,6 +1,6 @@
 <?php
     //Read command from index.html text
-    $input = $_GET["txt"];
+    $input = $_GET["sendTxt"];
         //[0] => Type, [1] => Option, [2] => Command
     $select_option = explode("=>", $input);
     $array_input = explode(";", $select_option[2]);
