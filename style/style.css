@@ -13,8 +13,6 @@ svg{
     box-shadow: 1px 1px 1px 2px rgba(222,222,222,0.2);
     width: 100%;
 }
-
-
 .dropdown-scrollable{
     height: 15vh;
     overflow-y: scroll;
@@ -25,9 +23,6 @@ div.modal-body h3{
 }
 div.modal-body td{
     font-size: 11pt;
-}
-.command-input{
-    margin-top: 2vh;
 }
 
 /* loading */
@@ -55,7 +50,7 @@ div.modal-body td{
 /* Textarea line. Found on  http://alan.blog-city.com/jquerylinedtextarea.htm*/
 
 textarea.lined{
-    width: 60vw;
+    width: 58vw;
     height: 30vh;
     background: rgba(233, 233, 233, 0.3);
 }
