@@ -1,20 +1,17 @@
-    
-    
-
-
-
-$(function () {
+var txt = "";
+$(document).ready(function () {
     $(".lined").linedtextarea(
         { selectedLine: 1 }
     );
-});
-
-//  === Hide submit buton and nav integration ===
-$(document).ready(function () {
+    //  === Hide submit buton and nav integration ===
     $("input#submitHide").hide();
 
     $("li#explore").click(function () {
         $("input#submitHide").click();
+        showGraph('EXPLORE', null);
+    })
+    $("textarea").click(function () {
+        $('.parsebtn').popover('destroy');
     })
 });
 
@@ -28,20 +25,22 @@ function stringManipulation(string) {
     string = string.replace(/=/ig, " =d= ");                //replace = to =d=
     return string;
 }
+function submitTxt() {
+    txt = $("textarea").val();
+    txt = stringManipulation(txt);
+}
 
 //  === Ajax, send from textarea to Maude command Function ===
 function showGraph(type, self) {
     $("#graph_txt").html("<div class='loader'></div>");
-    
-    // Getting the input from the user
-    var txt = $("textarea").val();
-    txt = stringManipulation(txt);
 
+    // Getting the input from the user
+    var sendTxt = "";
 
     if (type != "EXPLORE") {
-        txt = "REFRESH=>" + $(self).text().replace(/([a-z]\w*\s*)/ig, "\'$1") + '=>' + txt;
+        sendTxt = "REFRESH=>" + $(self).text().replace(/([a-z]\w*\s*)/ig, "\'$1") + '=>' + txt;
     } else {
-        txt = "EXPLORE=>" + "FIRST" + '=>' + txt;
+        sendTxt = "EXPLORE=>" + "FIRST" + '=>' + txt;
     };
 
     // The Ajax invocation
@@ -56,39 +55,59 @@ function showGraph(type, self) {
         }
     };
     // Note that the URL is create_graph.php and I use "?txt" to send the needed parameter (the input from the user)
-    xhttp.open("GET", "php/create_graph.php?txt=" + encodeURIComponent(txt), true);
+    xhttp.open("GET", "php/create_graph.php?sendTxt=" + encodeURIComponent(sendTxt), true);
     // Calling create_graph.php
     xhttp.send();
-
 }
-//  === Ajax, send from select option to Maude command Function ===
-function refreshGraph() {
+function getParse(sendTxt) {
+    // The Ajax invocation
+    var xhttp = new XMLHttpRequest();
 
-    $("select option:selected").each(function () {
-        var txt = $(this).text() + '=>' + $("textarea")[0].value;
-        var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+            // When create_graph.php finishes, we can recover its output by using the responseText field
+            // I used the content of create_graph.php to update the text "graph_txt"
+            $('.parsebtn').attr("maudeoutput", this.responseText);
+        }
+    };
+    // Note that the URL is create_graph.php and I use "?txt" to send the needed parameter (the input from the user)
+    xhttp.open("GET", "php/parse.php?sendTxt=" + encodeURIComponent(sendTxt), true);
+    // Calling create_graph.php
+    xhttp.send();
+}
+function parsebtn() {
+    $("input#submitHide").click();
+    getParse(txt);
 
+    setTimeout(function(){
+        var maudeOutput = $('.parsebtn').attr("maudeoutput");
+        if(maudeOutput.match(/Warning/ig) == null){
+            $('.parsebtn').popover({
+                title: "<h4 style='color: green;'><span class='glyphicon glyphicon-ok'> &nbsp;</span>Success</h4>",
+                content: "Everything works fine",
+                placement: "bottom",
+                trigger: "focus",
+                html: true
+            });
+        }else{
+            $('.parsebtn').popover({
+                title: "<h4 style='color: red;'><span class='glyphicon glyphicon-warning-sign'> &nbsp;</span>Warning</h4>",
+                content: maudeOutput,
+                placement: "bottom",
+                trigger: "focus",
+                html: true
+            });
+        }
 
-        xhttp.onreadystatechange = function () {
-            if (this.readyState == 4 && this.status == 200) {
-                // When create_graph.php finishes, we can recover its output by using the responseText field
-                // I used the content of create_graph.php to update the text "graph_txt"
-                $("div#graph_txt")[0].innerHTML = this.responseText;
-                //graph();
-            }
-        };
-        // Note that the URL is create_graph.php and I use "?txt" to send the needed parameter (the input from the user)
-        xhttp.open("GET", "php/refresh_graph.php?txt=" + encodeURIComponent(txt), true);
-        // Calling create_graph.php
-        xhttp.send();
+    $('.parsebtn').popover("show");
+    },700);
 
-    });
 }
 
 
 //  ===Create Graph ===
 function graph() {
-    
+
     //It creates three sizes based on screenswidth
     //          [>1100px, >600px, <=600px]
     widthSize = [300, 400, 800];
@@ -217,7 +236,7 @@ function graph() {
             )
         node.append("circle")
             .attr("r", nodeRadius[winSize])
-            .style("fill", function (d, i) { idColors[d.id] = colors(i);return idColors[d.id]; })
+            .style("fill", function (d, i) { idColors[d.id] = colors(i); return idColors[d.id]; })
         node.append("title")
             .text(function (d) { return d.id; });
         node.append("text")
@@ -403,12 +422,12 @@ function graph() {
         $("tbody#target td").remove();
         $("span#node").text(d.id);
         for (var i in allLinks) {
-            var circleColorInfo = "<span style = 'border:1px solid black;border-radius:25px;padding: 0px 6px;background-color: "+idColors[allLinks[i].target.id] + ";'>&nbsp;</span>"
+            var circleColorInfo = "<span style = 'border:1px solid black;border-radius:25px;padding: 0px 6px;background-color: " + idColors[allLinks[i].target.id] + ";'>&nbsp;</span>"
             if (allLinks[i].source.id == d.id) {
                 if (allLinks[i].target.id == d.id) {
-                    $("tbody#target").append("<tr><td><small>" +circleColorInfo + "&nbsp;&nbsp;self" + "</small></td>" + "<td><small>" + allLinks[i].type + "</small></td></tr>");
+                    $("tbody#target").append("<tr><td><small>" + circleColorInfo + "&nbsp;&nbsp;self" + "</small></td>" + "<td><small>" + allLinks[i].type + "</small></td></tr>");
                 } else {
-                    $("tbody#target").append("<tr><td><small>" + circleColorInfo + "&nbsp;&nbsp;"+allLinks[i].target.id + "</small></td>" + "<td><small>" + allLinks[i].type +"</small></td></tr>");
+                    $("tbody#target").append("<tr><td><small>" + circleColorInfo + "&nbsp;&nbsp;" + allLinks[i].target.id + "</small></td>" + "<td><small>" + allLinks[i].type + "</small></td></tr>");
                 }
 
             }
@@ -466,7 +485,7 @@ function graph() {
             var originalTextAreaWidth = textarea.outerWidth();
 
             /* Wrap the text area in the elements we need */
-            textarea.wrap("<div class='linedtextarea' style = 'width:60vw;height: 30vh;'></div>");
+            textarea.wrap("<div class='linedtextarea' style = 'width:60vw;height: 31vh;'></div>");
             var linedTextAreaDiv = textarea.parent().wrap("<div class='linedwrap' style='width:" + originalTextAreaWidth + "px'></div>");
             var linedWrapDiv = linedTextAreaDiv.parent();
 

@@ -86,7 +86,10 @@
                             <h4 class="modal-title">Process Network Algebra</h4>
                         </div>
                         <div class="modal-body">
-                                <h3>Process definitions should start with capital letters and channel names with small letters.<br><br></h3>
+                            <h3>Process definitions should start with capital letters and channel names with small letters.
+                                <br>
+                                <br>
+                            </h3>
                             <table class="table table-condensed">
                                 <thead>
                                     <th>CNA Expression </th>
@@ -138,13 +141,18 @@
             <!--End Syntax modal-->
 
             <div id="tab_edit" class="tab-pane fade in active">
-                <form>
-                    <div class="form-group">
-                        <label for="graph">New Graph:</label>
-                        <textarea class="lined" rows="5" name="graph" placeholder="Type commands on different lines. Comments can be typing with # on beginning of line"></textarea>
-                        <input id="submitHide" type="button" value="go" onclick="showGraph('EXPLORE',null)">
-                    </div>
-                </form>
+                <div class="row">
+                    <button class="parsebtn btn btn-default pull-right" onclick="parsebtn()">Parse</button>
+                </div>
+                <div class="row">
+                    <form>
+                        <div class="form-group">
+                            <label for="graph" class="command-input">New Graph:</label>
+                            <textarea class="lined" rows="5" name="graph" placeholder="Type commands on different lines. Comments can be typing with # on beginning of line"></textarea>
+                            <input id="submitHide" type="button" value="go" onclick="submitTxt();">
+                        </div>
+                    </form>
+                </div>
             </div>
             <div id="tab_explore" class="tab-pane fade">
                 <div id="graph_txt">
