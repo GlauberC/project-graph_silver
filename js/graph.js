@@ -1,8 +1,5 @@
-$(function () {
-    $(".lined").linedtextarea(
-        { selectedLine: 1 }
-    );
-});
+var inputFromIndex;
+
 
 //  === Hide submit buton and nav integration ===
 $(document).ready(function () {
@@ -11,7 +8,15 @@ $(document).ready(function () {
     $("li#explore").click(function () {
         $("input#submitHide").click();
     })
+    $(".lined").linedtextarea(
+        { selectedLine: 1 }
+    );
 });
+
+function getInputFromIndex(){
+    inputFromIndex = $("textarea").val();
+    inputFromIndex = stringManipulation(inputFromIndex);
+}
 
 function stringManipulation(string) {
     string = string.trim();                                 //remove spaces after ending
@@ -26,12 +31,12 @@ function stringManipulation(string) {
 
 //  === Ajax, send from textarea to Maude command Function ===
 function showGraph(type, self) {
+    getInputFromIndex();
     $("#graph_txt").html("<div class='loader'></div>");
     
     // Getting the input from the user
-    var txt = $("textarea").val();
-    txt = stringManipulation(txt);
 
+    var txt = inputFromIndex;
 
     if (type != "EXPLORE") {
         txt = "REFRESH=>" + $(self).text().replace(/([a-z]\w*\s*)/ig, "\'$1") + '=>' + txt;

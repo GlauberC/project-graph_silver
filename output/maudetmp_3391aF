@@ -1,0 +1,1 @@
+{    "nodes": [{"id":"F_1","group":1},{"id":"d_1 / tau.F_1","group":2},{"id":"tau / d_1.F_1","group":3}  ],    "links": [{"source":"F_1","target":"d_1 / tau.F_1","type":"u_1_L / tau"},{"source":"F_1","target":"tau / d_1.F_1","type":"tau / u_1_R"},{"source":"d_1 / tau.F_1","target":"F_1","type":"d_1 / tau"},{"source":"tau / d_1.F_1","target":"F_1","type":"tau / d_1"}  ]}

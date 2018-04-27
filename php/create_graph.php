@@ -13,9 +13,10 @@
     $select_active = (strcmp($select_option[0], "EXPLORE") == 0?$select[0]:$select_option[1]);
 
     $COMMAND = "red generateDot( { ".$select_active ."} , (" . implode(" , " ,$array_input) . ") ) .";
+    
 
     //Maude's directory
-    $DIR_MAUDE = "/usr/bin/maude";  //<- YOU MUST CHANGE HERE
+    $DIR_MAUDE = exec('which maude');  //<- YOU MUST CHANGE HERE
     $DIR_FILE_MAUDE = "../system/semantics.maude";
     $MODF = "-no-banner";
 
