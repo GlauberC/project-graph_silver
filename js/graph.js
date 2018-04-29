@@ -11,6 +11,9 @@ $(document).ready(function () {
     $(".lined").linedtextarea(
         { selectedLine: 1 }
     );
+    $("textarea").click(function(){
+        $('.btnParse').popover("destroy");
+    })
 });
 
 function getinputFromEdit() {
@@ -65,14 +68,18 @@ function showGraph(type, self) {
 }
 function LineCount(linesWarning) {
     lines = [];
-    processWarning = linesWarning.match(/.+\n*/ig);
+    var processWarning = linesWarning.match(/.+\n*/ig);
     allLines = inputFromEditUnmanipulated.replace(/(\w+)=.+/ig, '$1');
     allLines = allLines.match(/\w+/ig);
+    
     var j = 0;
     for (var index in allLines) {
         if (allLines[index].trim() == processWarning[j].trim()) {
             lines.push(index * 1 + 1);
             j++;
+            if(j == processWarning.length){
+                return lines;
+            }
         }
     }
     return lines;
@@ -101,6 +108,7 @@ function parseStringManipulation(request) {
 }
 
 function parsing() {
+    $('.btnParse').popover("destroy");
     getinputFromEdit()
     var request = $.ajax({
         type: "GET",
@@ -109,9 +117,28 @@ function parsing() {
         async: false
     }).responseText;
     request = parseStringManipulation(request);
-    console.log(request);
     //POPOVER BELLOW
+    if(request.match(/success/ig) == null){
+        request = request.replace(/\n/ig, '<br><br>');
+        $('.btnParse').popover({
+            title: "<h4 style='color: red;'><span class='glyphicon glyphicon-warning-sign'> &nbsp;</span>Warning</h4>",
+            content: request,
+            placement: "bottom",
+            trigger: "focus",
+            html: true
+        });
 
+
+    }else{
+        $('.btnParse').popover({
+            title: "<h4 style='color: green;'><span class='glyphicon glyphicon-ok'> &nbsp;</span>Success</h4>",
+            content: "Everything works fine",
+            placement: "bottom",
+            trigger: "focus",
+            html: true
+        });
+    }
+    $('.btnParse').popover("show");
 
 }
 

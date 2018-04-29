@@ -28,6 +28,9 @@ button.btnParse{
     margin-bottom: 1em;
     margin-right: 3em;
 }
+.popover{
+    max-width: 40vw; /* Max Width of the popover (depending on the container!) */
+}
 
 /* loading */
 .loader {
