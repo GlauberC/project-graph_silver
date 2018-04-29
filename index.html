@@ -138,16 +138,19 @@
             <!--End Syntax modal-->
 
             <div id="tab_edit" class="tab-pane fade in active">
-                <div>
+                <div class = "row">
+                    <div class='loaderParse loader col-lg-4 col-lg-offset-4'></div>
                     <button class = "btnParse btn btn-default pull-right" onclick="parsing()" parse="">Parse</button>
                 </div>
-                <form>
-                    <div class="form-group">
-                        <label for="graph">New Graph:</label>
-                        <textarea class="lined" rows="5" name="graph" placeholder="Type commands on different lines. Comments can be typing with # on beginning of line"></textarea>
-                        <input id="submitHide" type="button" value="go" onclick="showGraph('EXPLORE',null)">
-                    </div>
-                </form>
+                <div class = "row">
+                    <form>
+                        <div class="form-group">
+                            <label for="graph">New Graph:</label>
+                            <textarea class="lined" rows="5" name="graph" placeholder="Type commands on different lines. Comments can be typing with # on beginning of line"></textarea>
+                            <input id="submitHide" type="button" value="go" onclick="showGraph('EXPLORE',null)">
+                        </div>
+                    </form>
+                </div>
             </div>
             <div id="tab_explore" class="tab-pane fade">
                 <div id="graph_txt">

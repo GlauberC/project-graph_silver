@@ -4,6 +4,7 @@ var inputFromEditUnmanipulated;
 
 $(document).ready(function () {
     $("input#submitHide").hide();
+    $(".loaderParse").hide();
 
     $("li#explore").click(function () {
         $("input#submitHide").click();
@@ -108,6 +109,7 @@ function parseStringManipulation(request) {
 }
 
 function parsing() {
+    $(".loaderParse").show();
     $('.btnParse').popover("destroy");
     getinputFromEdit()
     var request = $.ajax({
@@ -139,6 +141,7 @@ function parsing() {
         });
     }
     $('.btnParse').popover("show");
+    $(".loaderParse").hide();
 
 }
 
