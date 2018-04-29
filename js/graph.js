@@ -1,7 +1,7 @@
-var inputFromIndex;
+var inputFromEdit;
+var inputFromEditUnmanipulated;
 
 
-//  === Hide submit buton and nav integration ===
 $(document).ready(function () {
     $("input#submitHide").hide();
 
@@ -13,9 +13,9 @@ $(document).ready(function () {
     );
 });
 
-function getInputFromIndex(){
-    inputFromIndex = $("textarea").val();
-    inputFromIndex = stringManipulation(inputFromIndex);
+function getinputFromEdit() {
+    inputFromEditUnmanipulated = $("textarea").val();
+    inputFromEdit = stringManipulation(inputFromEditUnmanipulated);
 }
 
 function stringManipulation(string) {
@@ -28,15 +28,17 @@ function stringManipulation(string) {
     string = string.replace(/=/ig, " =d= ");                //replace = to =d=
     return string;
 }
+// === Ajax - parse function
+
 
 //  === Ajax, send from textarea to Maude command Function ===
 function showGraph(type, self) {
-    getInputFromIndex();
+    getinputFromEdit();
     $("#graph_txt").html("<div class='loader'></div>");
-    
+
     // Getting the input from the user
 
-    var txt = inputFromIndex;
+    var txt = inputFromEdit;
 
     if (type != "EXPLORE") {
         txt = "REFRESH=>" + $(self).text().replace(/([a-z]\w*\s*)/ig, "\'$1") + '=>' + txt;
@@ -61,34 +63,63 @@ function showGraph(type, self) {
     xhttp.send();
 
 }
-//  === Ajax, send from select option to Maude command Function ===
-function refreshGraph() {
-
-    $("select option:selected").each(function () {
-        var txt = $(this).text() + '=>' + $("textarea")[0].value;
-        var xhttp = new XMLHttpRequest();
-
-
-        xhttp.onreadystatechange = function () {
-            if (this.readyState == 4 && this.status == 200) {
-                // When create_graph.php finishes, we can recover its output by using the responseText field
-                // I used the content of create_graph.php to update the text "graph_txt"
-                $("div#graph_txt")[0].innerHTML = this.responseText;
-                //graph();
-            }
-        };
-        // Note that the URL is create_graph.php and I use "?txt" to send the needed parameter (the input from the user)
-        xhttp.open("GET", "php/refresh_graph.php?txt=" + encodeURIComponent(txt), true);
-        // Calling create_graph.php
-        xhttp.send();
-
-    });
+function LineCount(linesWarning) {
+    lines = [];
+    processWarning = linesWarning.match(/.+\n*/ig);
+    allLines = inputFromEditUnmanipulated.replace(/(\w+)=.+/ig, '$1');
+    allLines = allLines.match(/\w+/ig);
+    var j = 0;
+    for (var index in allLines) {
+        if (allLines[index].trim() == processWarning[j].trim()) {
+            lines.push(index * 1 + 1);
+            j++;
+        }
+    }
+    return lines;
 }
+function parseStringManipulation(request) {
+    request = request.replace(/<br>/ig, "");
+    request = request.replace(/Maude> Bye\.\n*/ig, "");
+    request = request.replace(/(line\sX\s).+line 1:\s/ig, "$1");
+    request = request.replace(/Warning.+\n/ig, "");
+    request = request.replace(/\n/ig, "");
+    request = request.replace(/(line\sX\s)/ig, "\n$1");
+    linesProcess = request.replace(/line\sX\s.+generateDot\s+\(\s+{\s+\'(\w+).+/ig, "$1")
+    lines = LineCount(linesProcess)
+    linesProcess = request.match(/.+\n*/ig);
+
+    var j = 0;
+    request = "";
+    for (var index in linesProcess) {
+        request = request + linesProcess[index].replace(/(line )X/i, "$1" + lines[j]);
+        j++;
+    }
+    request = request.replace(/\'/ig, "");
+    request = request.replace(/=d=/ig, "=");
+
+    return request;
+}
+
+function parsing() {
+    getinputFromEdit()
+    var request = $.ajax({
+        type: "GET",
+        data: { txt: inputFromEdit },
+        url: 'php/parse.php',
+        async: false
+    }).responseText;
+    request = parseStringManipulation(request);
+    console.log(request);
+    //POPOVER BELLOW
+
+
+}
+
 
 
 //  ===Create Graph ===
 function graph() {
-    
+
     //It creates three sizes based on screenswidth
     //          [>1100px, >600px, <=600px]
     widthSize = [300, 400, 800];
@@ -217,7 +248,7 @@ function graph() {
             )
         node.append("circle")
             .attr("r", nodeRadius[winSize])
-            .style("fill", function (d, i) { idColors[d.id] = colors(i);return idColors[d.id]; })
+            .style("fill", function (d, i) { idColors[d.id] = colors(i); return idColors[d.id]; })
         node.append("title")
             .text(function (d) { return d.id; });
         node.append("text")
@@ -403,12 +434,12 @@ function graph() {
         $("tbody#target td").remove();
         $("span#node").text(d.id);
         for (var i in allLinks) {
-            var circleColorInfo = "<span style = 'border:1px solid black;border-radius:25px;padding: 0px 6px;background-color: "+idColors[allLinks[i].target.id] + ";'>&nbsp;</span>"
+            var circleColorInfo = "<span style = 'border:1px solid black;border-radius:25px;padding: 0px 6px;background-color: " + idColors[allLinks[i].target.id] + ";'>&nbsp;</span>"
             if (allLinks[i].source.id == d.id) {
                 if (allLinks[i].target.id == d.id) {
-                    $("tbody#target").append("<tr><td><small>" +circleColorInfo + "&nbsp;&nbsp;self" + "</small></td>" + "<td><small>" + allLinks[i].type + "</small></td></tr>");
+                    $("tbody#target").append("<tr><td><small>" + circleColorInfo + "&nbsp;&nbsp;self" + "</small></td>" + "<td><small>" + allLinks[i].type + "</small></td></tr>");
                 } else {
-                    $("tbody#target").append("<tr><td><small>" + circleColorInfo + "&nbsp;&nbsp;"+allLinks[i].target.id + "</small></td>" + "<td><small>" + allLinks[i].type +"</small></td></tr>");
+                    $("tbody#target").append("<tr><td><small>" + circleColorInfo + "&nbsp;&nbsp;" + allLinks[i].target.id + "</small></td>" + "<td><small>" + allLinks[i].type + "</small></td></tr>");
                 }
 
             }
