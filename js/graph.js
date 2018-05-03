@@ -6,15 +6,25 @@ $(document).ready(function () {
     $("input#submitHide").hide();
     $(".loaderParse").hide();
 
+
     $("li#explore").click(function () {
-        $("input#submitHide").click();
+        if(parsing()){
+            showGraph("EXPLORE", null)
+            $("li#explore").addClass("active");
+            $("li#edit").removeClass("active");
+            $("button#hidden").click();
+        }
+    })
+    $("li#edit").click(function(){
+        $('.btnParse').popover("destroy");
     })
     $(".lined").linedtextarea(
         { selectedLine: 1 }
     );
-    $("textarea").click(function(){
+    $("textarea").click(function () {
         $('.btnParse').popover("destroy");
     })
+
 });
 
 function getinputFromEdit() {
@@ -38,7 +48,7 @@ function stringManipulation(string) {
 //  === Ajax, send from textarea to Maude command Function ===
 function showGraph(type, self) {
     getinputFromEdit();
-    $("#graph_txt").html("<div class='loader'></div>");
+    $("div.loaderParse").html("<div class='loader'></div>");
 
     // Getting the input from the user
 
@@ -66,19 +76,23 @@ function showGraph(type, self) {
     // Calling create_graph.php
     xhttp.send();
 
+
 }
 function LineCount(linesWarning) {
     lines = [];
-    var processWarning = linesWarning.match(/.+\n*/ig);
+    var processWarning = linesWarning.match(/\d+/ig);
     allLines = inputFromEditUnmanipulated.replace(/(\w+)=.+/ig, '$1');
-    allLines = allLines.match(/\w+/ig);
-    
+    allLines = allLines.match(/.+/ig);
     var j = 0;
+    var counter = 0;
     for (var index in allLines) {
-        if (allLines[index].trim() == processWarning[j].trim()) {
-            lines.push(index * 1 + 1);
+        if (!/^#/.test(allLines[index])) {
+            counter++;
+        }
+        if (counter == processWarning[j]) {
+            lines.push(index / 1 + 1);
             j++;
-            if(j == processWarning.length){
+            if (j == processWarning.length) {
                 return lines;
             }
         }
@@ -88,18 +102,19 @@ function LineCount(linesWarning) {
 function parseStringManipulation(request) {
     request = request.replace(/<br>/ig, "");
     request = request.replace(/Maude> Bye\.\n*/ig, "");
-    request = request.replace(/(line\sX\s).+line 1:\s/ig, "$1");
+    request = request.replace(/(line\s\d+\s).+line 1:\s/ig, "$1");
     request = request.replace(/Warning.+\n/ig, "");
     request = request.replace(/\n/ig, "");
-    request = request.replace(/(line\sX\s)/ig, "\n$1");
-    linesProcess = request.replace(/line\sX\s.+generateDot\s+\(\s+{\s+\'(\w+).+/ig, "$1")
+    request = request.replace(/(line\s\d+\s)/ig, "\n$1");
+    request = request.replace(/generateDot\s/ig, " ");
+    linesProcess = request.replace(/line\s(\d+)\s.+/ig, "$1")
     lines = LineCount(linesProcess)
     linesProcess = request.match(/.+\n*/ig);
 
     var j = 0;
     request = "";
     for (var index in linesProcess) {
-        request = request + linesProcess[index].replace(/(line )X/i, "$1" + lines[j]);
+        request = request + linesProcess[index].replace(/(line\s)\d+/i, "$1" + lines[j]);
         j++;
     }
     request = request.replace(/\'/ig, "");
@@ -109,7 +124,8 @@ function parseStringManipulation(request) {
 }
 
 function parsing() {
-    $(".loaderParse").show();
+    var decision;
+    $("div.loaderParse").show();
     $('.btnParse').popover("destroy");
     getinputFromEdit()
     var request = $.ajax({
@@ -118,9 +134,10 @@ function parsing() {
         url: 'php/parse.php',
         async: false
     }).responseText;
-    request = parseStringManipulation(request);
     //POPOVER BELLOW
-    if(request.match(/success/ig) == null){
+    if (!/^success$/.test(request)) {
+        decision = false;
+        request = parseStringManipulation(request);
         request = request.replace(/\n/ig, '<br><br>');
         $('.btnParse').popover({
             title: "<h4 style='color: red;'><span class='glyphicon glyphicon-warning-sign'> &nbsp;</span>Warning</h4>",
@@ -129,9 +146,8 @@ function parsing() {
             trigger: "focus",
             html: true
         });
-
-
-    }else{
+    } else {
+        decision = true;
         $('.btnParse').popover({
             title: "<h4 style='color: green;'><span class='glyphicon glyphicon-ok'> &nbsp;</span>Success</h4>",
             content: "Everything works fine",
@@ -142,6 +158,7 @@ function parsing() {
     }
     $('.btnParse').popover("show");
     $(".loaderParse").hide();
+    return decision;
 
 }
 
