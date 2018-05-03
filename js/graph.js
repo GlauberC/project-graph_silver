@@ -4,19 +4,23 @@ var inputFromEditUnmanipulated;
 
 $(document).ready(function () {
     $("input#submitHide").hide();
-    $(".loaderParse").hide();
 
 
     $("li#explore").click(function () {
-        if(parsing()){
-            showGraph("EXPLORE", null)
-            $("li#explore").addClass("active");
-            $("li#edit").removeClass("active");
-            $("button#hidden").click();
-        }
+        parsing('EXPLORER');
     })
-    $("li#edit").click(function(){
+
+    $("button#hidden").click(function () {
+        $("li#explore").addClass("active");
+        $("li#edit").removeClass("active");
+        showGraph("EXPLORE", null)
+
+    })
+
+
+    $("li#edit").click(function () {
         $('.btnParse').popover("destroy");
+        $("div.loaderParse").html("");
     })
     $(".lined").linedtextarea(
         { selectedLine: 1 }
@@ -123,42 +127,46 @@ function parseStringManipulation(request) {
     return request;
 }
 
-function parsing() {
-    var decision;
-    $("div.loaderParse").show();
+function parsing(explorer) {
+    $("div.loaderParse").html("<div class='loader'></div>");
     $('.btnParse').popover("destroy");
     getinputFromEdit()
-    var request = $.ajax({
+    $.ajax({
         type: "GET",
         data: { txt: inputFromEdit },
         url: 'php/parse.php',
-        async: false
-    }).responseText;
-    //POPOVER BELLOW
-    if (!/^success$/.test(request)) {
-        decision = false;
-        request = parseStringManipulation(request);
-        request = request.replace(/\n/ig, '<br><br>');
-        $('.btnParse').popover({
-            title: "<h4 style='color: red;'><span class='glyphicon glyphicon-warning-sign'> &nbsp;</span>Warning</h4>",
-            content: request,
-            placement: "bottom",
-            trigger: "focus",
-            html: true
-        });
-    } else {
-        decision = true;
-        $('.btnParse').popover({
-            title: "<h4 style='color: green;'><span class='glyphicon glyphicon-ok'> &nbsp;</span>Success</h4>",
-            content: "Everything works fine",
-            placement: "bottom",
-            trigger: "focus",
-            html: true
-        });
-    }
-    $('.btnParse').popover("show");
-    $(".loaderParse").hide();
-    return decision;
+        success: function (request) {
+            //POPOVER BELLOW
+            if (!/^success$/.test(request)) {
+                request = parseStringManipulation(request);
+                request = request.replace(/\n/ig, '<br><br>');
+                $('.btnParse').popover({
+                    title: "<h4 style='color: red;'><span class='glyphicon glyphicon-warning-sign'> &nbsp;</span>Warning</h4>",
+                    content: request,
+                    placement: "bottom",
+                    trigger: "focus",
+                    html: true
+                });
+            } else {
+                if (explorer == "EXPLORER") {
+                    $("button#hidden").click();
+                } else {
+                    $('.btnParse').popover({
+                        title: "<h4 style='color: green;'><span class='glyphicon glyphicon-ok'> &nbsp;</span>Success</h4>",
+                        content: "Everything works fine",
+                        placement: "bottom",
+                        trigger: "focus",
+                        html: true
+                    });
+                }
+
+            }
+            $("div.loaderParse").html("");
+            $('.btnParse').popover("show");
+        }
+    });
+
+
 
 }
 
