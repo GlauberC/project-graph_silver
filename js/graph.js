@@ -30,7 +30,6 @@ $(document).ready(function () {
 });
 
 function example3Dinnigs(){
-    console.log("test");
     $('textarea').val("#Example of 3 dinning philosophers\n"+
             "# The whole system\n"+ 
             "System = [d_0, d_1, d_2, u_0_L, u_0_R, u_1_L, u_1_R, u_2_L,u_2_R]{P_2} | \({F_2} | \({P_1} | \({F_1} | \({P_0} | {F_0}\)\)\)\)\n"+
