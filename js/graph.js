@@ -3,8 +3,6 @@ var inputFromEditUnmanipulated;
 
 
 $(document).ready(function () {
-    $("input#submitHide").hide();
-
 
     $("li#explore").click(function () {
         parsing('EXPLORER');
@@ -28,8 +26,31 @@ $(document).ready(function () {
     $("textarea").click(function () {
         $('.btnParse').popover("destroy");
     })
-
+    
 });
+
+function example3Dinnigs(){
+    console.log("test");
+    $('textarea').val("#Example of 3 dinning philosophers\n"+
+            "# The whole system\n"+ 
+            "System = [d_0, d_1, d_2, u_0_L, u_0_R, u_1_L, u_1_R, u_2_L,u_2_R]{P_2} | \({F_2} | \({P_1} | \({F_1} | \({P_0} | {F_0}\)\)\)\)\n"+
+            "# Forks\n"+
+            "F_0 = tau \\ u_0_R . tau \\ d_0 . { F_0} + u_0_L \\ tau . d_0 \\ tau . {F_0}\n"+
+            "F_1 = tau \\ u_1_R . tau \\ d_1 . {F_1} + u_1_L \\ tau . d_1 \\ tau . {F_1}\n"+
+            "F_2 = tau \\ u_2_R . tau \\ d_2 . { F_2} + u_2_L \\ tau . d_2 \\ tau . {F_2}\n"+
+            "# Philosophers\n"+
+            "P_0 = tau \\ think_0 . {P_0} + u_0_R \\ u_1_L . {eat_0}\n"+
+            "P_1 = tau \\ think_1 . {P_1} + u_1_R \\ u_2_L . {eat_1}\n"+
+            "P_2 = tau \\ think_2 . {P_2} + u_2_R \\ u_0_L . {eat_2}\n"+
+            "# Eating actions\n"+
+            "eat_0 = tau \\ eat_0 . {release_0}\n"+
+            "eat_1 = tau \\ eat_1 . {release_1}\n"+
+            "eat_2 = tau \\ eat_2 . {release_2}\n"+
+            "# Release Actions\n"+
+            "release_0 = d_0 \\ d_1 . {P_0}\n"+
+            "release_1 = d_1 \\ d_2 . {P_1}\n"+
+            "release_2 = d_2 \\ d_0 . {P_2}");
+}
 
 function getinputFromEdit() {
     inputFromEditUnmanipulated = $("textarea").val();
