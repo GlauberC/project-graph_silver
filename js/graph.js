@@ -32,6 +32,19 @@ $(document).ready(function () {
     
 });
 
+function clickSizeToggle(){
+    var expand = $('div#graph-container').attr('expand');
+    if(expand=='false'){
+        $('div#graph-container').css('height','80vh');
+        $('div#graph-container').css('width','80vw');
+        $('div#graph-container').attr('expand','true');
+    }else{
+        $('div#graph-container').css('height','60vh');
+        $('div#graph-container').css('width','60vw');
+        $('div#graph-container').attr('expand','false');
+    }
+    
+}
 
 function getinputFromEdit() {
     inputFromEditUnmanipulated = $("textarea").val();

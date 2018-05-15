@@ -43,8 +43,9 @@
                         echo "</ul>
             </div>";
     //It creates body of graph
-    echo "<div id='graph-container' dir='$file_name'></div>
+    echo "<div expand = 'false' id='graph-container' dir='$file_name'></div>
             <div id='info-node-link' class='container-full'>
+            <button  class='btn btn-xs btn-primary btn-block' onclick='clickSizeToggle()'>Change graph's size</button>
                 <h2> <small id='node'>Node:  <strong><span id='node'></small></span></strong><h2>
                     <table class='table table-bordered table-striped table-condensed'>
                         <thead>
