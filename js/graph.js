@@ -13,6 +13,10 @@ $(document).ready(function () {
         showGraph("EXPLORE", null)
 
     })
+    $("a.exampleDropdown").click(function () {   
+        $("a#edit").click();
+
+    })
 
 
     $("li#edit").click(function () {

@@ -18,7 +18,6 @@ function example3Dinnigs(){
             "release_0 = d_0 \\ d_1 . {P_0}\n"+
             "release_1 = d_1 \\ d_2 . {P_1}\n"+
             "release_2 = d_2 \\ d_0 . {P_2}");
-    $('li#edit').click();
 }
 
 function examplePeterson(){
