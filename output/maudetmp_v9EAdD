@@ -1,0 +1,1 @@
+{    "nodes": [{"id":"B","group":1}  ],    "links": [{"source":"B","target":"B","type":"c / d"}  ]}
