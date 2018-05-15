@@ -174,9 +174,7 @@ function parsing(explorer) {
 function graph() {
 
     //It creates three sizes based on screenswidth
-    //          [>1100px, >600px, <=600px]
-    widthSize = [300, 400, 800];
-    heightSize = [250, 350, 450];
+    //          [ <=600px, >600px, >1100px]
     nodeRadius = [8, 10, 12]; //Node's radius
     MarkrefX = [15, 17, 20]; //Proximity of the arrows to nodes
 
@@ -194,8 +192,8 @@ function graph() {
     winSize = windowSizeCalculation(window.innerWidth);
 
     //It defines the graph size
-    var width = widthSize[winSize];
-    var height = heightSize[winSize];
+    var width = 1500;
+    var height = 1500;
 
     //It gets the Json filename from output
     $fileName = $("div#graph-container").attr("dir");
