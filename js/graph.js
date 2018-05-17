@@ -2,7 +2,7 @@ var inputFromEdit;
 var inputFromEditUnmanipulated;
 
 $(document).ready(function () {
-    
+
     $("li#explore").click(function () {
         parsing('EXPLORER');
     })
@@ -13,7 +13,7 @@ $(document).ready(function () {
         showGraph("EXPLORE", null)
 
     })
-    $("a.exampleDropdown").click(function () {   
+    $("a.exampleDropdown").click(function () {
         $("a#edit").click();
 
     })
@@ -29,25 +29,25 @@ $(document).ready(function () {
     $("textarea").click(function () {
         $('.btnParse').popover("destroy");
     })
-    
+
 });
-function initialScroll(){
+function initialScroll() {
     $('div#graph-container').scrollTop(550);
     $('div#graph-container').scrollLeft(300);
 }
 
-function clickSizeToggle(){
+function clickSizeToggle() {
     var expand = $('div#graph-container').attr('expand');
-    if(expand=='false'){
-        $('div#graph-container').css('height','80vh');
-        $('div#graph-container').css('width','80vw');
-        $('div#graph-container').attr('expand','true');
-    }else{
-        $('div#graph-container').css('height','60vh');
-        $('div#graph-container').css('width','60vw');
-        $('div#graph-container').attr('expand','false');
+    if (expand == 'false') {
+        $('div#graph-container').css('height', '80vh');
+        $('div#graph-container').css('width', '80vw');
+        $('div#graph-container').attr('expand', 'true');
+    } else {
+        $('div#graph-container').css('height', '60vh');
+        $('div#graph-container').css('width', '60vw');
+        $('div#graph-container').attr('expand', 'false');
     }
-    
+
 }
 
 function getinputFromEdit() {
@@ -98,7 +98,7 @@ function showGraph(type, self) {
     xhttp.open("GET", "php/create_graph.php?txt=" + encodeURIComponent(txt), true);
     // Calling create_graph.php
     xhttp.send();
-    
+
 
 }
 function LineCount(linesWarning) {
@@ -225,7 +225,10 @@ function graph() {
     //It starts Force-Directed Graph
     //It creates Window
     var colors = d3.scaleOrdinal(d3.schemeCategory10);
-    var svg = d3.select("svg"),
+    var svg = d3.select("svg")
+        .call(d3.zoom().on("zoom", function () {
+            svg.attr("transform", d3.event.transform)
+        })).on("mousedown.zoom", null).on("dblclick.zoom", null),
         width = +svg.attr("width"),
         height = +svg.attr("height"),
         node,
