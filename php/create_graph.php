@@ -56,7 +56,7 @@
                         </thead>
                         <tbody id='target'>
                         </tbody>
-                    </table>     
+                    </table>  
         </div>
         </div>";
 ?>

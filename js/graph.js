@@ -2,7 +2,7 @@ var inputFromEdit;
 var inputFromEditUnmanipulated;
 
 $(document).ready(function () {
-
+    
     $("li#explore").click(function () {
         parsing('EXPLORER');
     })
@@ -31,6 +31,10 @@ $(document).ready(function () {
     })
     
 });
+function initialScroll(){
+    $('div#graph-container').scrollTop(550);
+    $('div#graph-container').scrollLeft(300);
+}
 
 function clickSizeToggle(){
     var expand = $('div#graph-container').attr('expand');
@@ -94,7 +98,7 @@ function showGraph(type, self) {
     xhttp.open("GET", "php/create_graph.php?txt=" + encodeURIComponent(txt), true);
     // Calling create_graph.php
     xhttp.send();
-
+    
 
 }
 function LineCount(linesWarning) {
@@ -189,12 +193,10 @@ function parsing(explorer) {
 
 //  ===Create Graph ===
 function graph() {
-
     //It creates three sizes based on screenswidth
     //          [ <=600px, >600px, >1100px]
     nodeRadius = [8, 10, 12]; //Node's radius
     MarkrefX = [15, 17, 20]; //Proximity of the arrows to nodes
-
     //It return de 0,1 or 2 based on width size
     function windowSizeCalculation(width) {
         if (width > 1100) {
@@ -330,6 +332,7 @@ function graph() {
 
         //It was important to send information to table.
         allLinks = links;
+        initialScroll();
 
         //Toggle stores whether the highlighting is on
         var toggle = 0;
