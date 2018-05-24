@@ -225,10 +225,7 @@ function graph() {
     //It starts Force-Directed Graph
     //It creates Window
     var colors = d3.scaleOrdinal(d3.schemeCategory10);
-    var svg = d3.select("svg")
-        .call(d3.zoom().on("zoom", function () {
-            svg.attr("transform", d3.event.transform)
-        })).on("mousedown.zoom", null).on("dblclick.zoom", null),
+    var svg = d3.select("svg"),
         width = +svg.attr("width"),
         height = +svg.attr("height"),
         node,
