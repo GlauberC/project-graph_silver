@@ -359,8 +359,6 @@ function graph() {
             if (toggle == 0) {
                 //Reduce the opacity of all but the neighbouring nodes
                 d = d3.select(this).node().__data__;
-                colorBackup = d3.select(this).node().firstChild.style.fill;
-                d3.select(this).node().firstChild.style.fill = 'red';
                 node.style("opacity", function (o) {
                     return neighboring(d, o) | neighboring(o, d) ? 1 : 0.1;
                 });
@@ -375,11 +373,6 @@ function graph() {
                 toggle = 1;
             } else {
                 //Put them back to opacity=1
-                for(i = 0; i<node._groups[0].length; i++){
-                    if(node._groups[0][i].firstChild.style.fill == 'red'){
-                        node._groups[0][i].firstChild.style.fill = colorBackup;
-                    }
-                }
                 node.style("opacity", 1);
                 link.style("opacity", 1);
                 edgelabels.style("opacity", 1);
@@ -513,6 +506,13 @@ function graph() {
 
     //Drags functions
     function dragstarted(d) {
+        for(i = 0; i<node._groups[0].length; i++){
+            if(node._groups[0][i].firstChild.style.fill == 'red'){
+                node._groups[0][i].firstChild.style.fill = colorBackup;
+            }
+        }
+        colorBackup = d3.select(this).node().firstChild.style.fill;
+        d3.select(this).node().firstChild.style.fill = 'red';
         if (!d3.event.active) simulation.alphaTarget(0.3).restart()
         d.fx = d.x;
         d.fy = d.y;
