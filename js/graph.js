@@ -1,5 +1,6 @@
 var inputFromEdit;
 var inputFromEditUnmanipulated;
+var colorBackup; 
 
 $(document).ready(function () {
 
@@ -318,7 +319,13 @@ function graph() {
             )
         node.append("circle")
             .attr("r", nodeRadius[winSize])
-            .style("fill", function (d, i) { idColors[d.id] = colors(i); return idColors[d.id]; })
+            .style("fill", function (d, i) { 
+                idColors[d.id] = colors(i);
+                if(idColors[d.id] == '#d62728'){
+                    idColors[d.id] = "#ffcc00";
+                }
+                return idColors[d.id]; 
+            })
         node.append("title")
             .text(function (d) { return d.id; });
         node.append("text")
@@ -352,6 +359,8 @@ function graph() {
             if (toggle == 0) {
                 //Reduce the opacity of all but the neighbouring nodes
                 d = d3.select(this).node().__data__;
+                colorBackup = d3.select(this).node().firstChild.style.fill;
+                d3.select(this).node().firstChild.style.fill = 'red';
                 node.style("opacity", function (o) {
                     return neighboring(d, o) | neighboring(o, d) ? 1 : 0.1;
                 });
@@ -361,10 +370,16 @@ function graph() {
                 edgelabels.style("opacity", function (o) {
                     return d.index == o.source.index | d.index == o.target.index ? 1 : 0.1;
                 });
+
                 //Reduce the op
                 toggle = 1;
             } else {
                 //Put them back to opacity=1
+                for(i = 0; i<node._groups[0].length; i++){
+                    if(node._groups[0][i].firstChild.style.fill == 'red'){
+                        node._groups[0][i].firstChild.style.fill = colorBackup;
+                    }
+                }
                 node.style("opacity", 1);
                 link.style("opacity", 1);
                 edgelabels.style("opacity", 1);
@@ -508,7 +523,7 @@ function graph() {
             var circleColorInfo = "<span style = 'border:1px solid black;border-radius:25px;padding: 0px 6px;background-color: " + idColors[allLinks[i].target.id] + ";'>&nbsp;</span>"
             if (allLinks[i].source.id == d.id) {
                 if (allLinks[i].target.id == d.id) {
-                    $("tbody#target").append("<tr><td><small>" + circleColorInfo + "&nbsp;&nbsp;self" + "</small></td>" + "<td><small>" + allLinks[i].type + "</small></td></tr>");
+                    $("tbody#target").append("<tr><td><small>" + "&nbsp;&nbsp;self" + "</small></td>" + "<td><small>" + allLinks[i].type + "</small></td></tr>");
                 } else {
                     $("tbody#target").append("<tr><td><small>" + circleColorInfo + "&nbsp;&nbsp;" + allLinks[i].target.id + "</small></td>" + "<td><small>" + allLinks[i].type + "</small></td></tr>");
                 }
