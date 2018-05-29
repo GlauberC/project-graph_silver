@@ -4,7 +4,7 @@ function createFile($COMMAND, $DIR_MAUDE, $DIR_FILE_MAUDE, $MODF){
     $COMMAND = escapeshellarg($COMMAND);
 
     //Run
-    $result =  shell_exec("echo $COMMAND | $DIR_MAUDE $DIR_FILE_MAUDE $MODF 2>&1 ");
+    $result =  shell_exec("timeout 30 sh -c \"echo $COMMAND | $DIR_MAUDE $DIR_FILE_MAUDE $MODF 2>&1 \"");
 
     //Break the lines to array
     $cutOutputString = outputCut($result);
