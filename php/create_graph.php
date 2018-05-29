@@ -28,7 +28,7 @@
     echo "
             <div class='graph-interface'>
             <div class='dropdown'>
-                    <button class='btn btn-default dropdown-toggle' type='button' data-toggle='dropdown'>$process_active
+                    <button class='btn-process btn btn-default dropdown-toggle' type='button' data-toggle='dropdown'>$process_active
                     <span class='caret'></span></button>
                         <ul class='dropdown-menu dropdown-scrollable'>";
 

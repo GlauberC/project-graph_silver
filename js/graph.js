@@ -1,6 +1,6 @@
 var inputFromEdit;
 var inputFromEditUnmanipulated;
-var colorBackup; 
+var colorBackup;
 
 $(document).ready(function () {
 
@@ -319,12 +319,16 @@ function graph() {
             )
         node.append("circle")
             .attr("r", nodeRadius[winSize])
-            .style("fill", function (d, i) { 
-                idColors[d.id] = colors(i);
-                if(idColors[d.id] == '#d62728'){
-                    idColors[d.id] = "#ffcc00";
+            .style("fill", function (d, i) {
+                if (this.__data__.id == $('.btn-process').text().replace(/\s/ig, '')) {
+                    idColors[d.id] = 'red';
+                } else {
+                    idColors[d.id] = colors(i);
+                    if (idColors[d.id] == '#d62728') {
+                        idColors[d.id] = "#ffcc00";
+                    }
                 }
-                return idColors[d.id]; 
+                return idColors[d.id];
             })
         node.append("title")
             .text(function (d) { return d.id; });
@@ -506,13 +510,13 @@ function graph() {
 
     //Drags functions
     function dragstarted(d) {
-        for(i = 0; i<node._groups[0].length; i++){
-            if(node._groups[0][i].firstChild.style.fill == 'red'){
+        for (i = 0; i < node._groups[0].length; i++) {
+            if (node._groups[0][i].firstChild.style.fill == 'black') {
                 node._groups[0][i].firstChild.style.fill = colorBackup;
             }
         }
         colorBackup = d3.select(this).node().firstChild.style.fill;
-        d3.select(this).node().firstChild.style.fill = 'red';
+        d3.select(this).node().firstChild.style.fill = 'black';
         if (!d3.event.active) simulation.alphaTarget(0.3).restart()
         d.fx = d.x;
         d.fy = d.y;
