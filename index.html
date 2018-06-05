@@ -19,81 +19,83 @@
 
 
 <body>
-    <div class="container-full">
-        <nav class="navbar navbar-default" role="navigation">
-            <div class="container">
-                <!-- Brand and toggle get grouped for better mobile display -->
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#silver-navbar-collapse">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                    <a class="navbar-brand" href="index.html">SiLVer Graph</a>
-                </div>
-                <!-- Collect the nav links, forms, and other content for toggling -->
-                <div class="collapse navbar-collapse" id="silver-navbar-collapse">
-                    <ul class="nav navbar-nav nav-tabs">
-                        <li id="edit" class="active">
-                            <a id="edit" data-toggle="tab" href="#tab_edit">Edit</a>
-                        </li>
+    <main class="container-full">
+        <header>
+            <nav class="navbar navbar-default" role="navigation">
+                <div class="container">
+                    <!-- Brand and toggle get grouped for better mobile display -->
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#silver-navbar-collapse">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        <a class="navbar-brand" href="index.html">SiLVer Graph</a>
+                    </div>
+                    <!-- Collect the nav links, forms, and other content for toggling -->
+                    <div class="collapse navbar-collapse" id="silver-navbar-collapse">
+                        <ul class="nav navbar-nav nav-tabs">
+                            <li id="edit" class="active">
+                                <a id="edit" data-toggle="tab" href="#tab_edit">Edit</a>
+                            </li>
 
-                        <li id="explore">
-                            <a id="id_tab2">Explore</a>
-                        </li>
-                        <li id="verif">
-                            <a id="verif_tab" data-toggle="tab" href="#tab_verify">Verif</a>
-                        </li>
-                    </ul>
-                    <ul class="nav navbar-nav navbar-right">
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Examples
-                                <span class="glyphicon glyphicon-menu-down"></span>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li>
-                                    <a class='exampleDropdown' href="#" onClick="exampleRestrictions()">Restrictions</a>
-                                </li>
-                                <li>
-                                    <a class='exampleDropdown' href="#" onClick="exampleSequentialProcesses()">Sequential Processes</a>
-                                </li>
-                                <li>
-                                    <a class='exampleDropdown' href="#" onClick="exampleParallel()">Parallel composition</a>
-                                </li>
-                                <li>
-                                    <a class='exampleDropdown' href="#" onClick="exampleParallelTauTransitions()">Parallel composition (tau transitions)</a>
-                                </li>
-                                <li class="divider"></li>
-                                <li>
-                                    <a class='exampleDropdown' href="#" onClick="example3Dinnigs()">
-                                        <span class='challenge'>3 Dinning Philosophers</span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class='exampleDropdown' href="#" onClick="examplePeterson()">
-                                        <span class='challenge'>Peterson Algorithm</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li>
-                            <a data-toggle="modal" href="#syntax-modal">Syntax</a>
-                        </li>
-                        <li>
-                            <a data-toggle="modal" href="#about-modal">About</a>
-                        </li>
-                    </ul>
+                            <li id="explore">
+                                <a id="id_tab2">Explore</a>
+                            </li>
+                            <li id="verif">
+                                <a id="verif_tab" data-toggle="tab" href="#tab_verify">Verif</a>
+                            </li>
+                        </ul>
+                        <ul class="nav navbar-nav navbar-right">
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Examples
+                                    <span class="glyphicon glyphicon-menu-down"></span>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a class='exampleDropdown' href="#" onClick="exampleRestrictions()">Restrictions</a>
+                                    </li>
+                                    <li>
+                                        <a class='exampleDropdown' href="#" onClick="exampleSequentialProcesses()">Sequential Processes</a>
+                                    </li>
+                                    <li>
+                                        <a class='exampleDropdown' href="#" onClick="exampleParallel()">Parallel composition</a>
+                                    </li>
+                                    <li>
+                                        <a class='exampleDropdown' href="#" onClick="exampleParallelTauTransitions()">Parallel composition (tau transitions)</a>
+                                    </li>
+                                    <li class="divider"></li>
+                                    <li>
+                                        <a class='exampleDropdown' href="#" onClick="example3Dinnigs()">
+                                            <span class='challenge'>3 Dinning Philosophers</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class='exampleDropdown' href="#" onClick="examplePeterson()">
+                                            <span class='challenge'>Peterson Algorithm</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a data-toggle="modal" href="#syntax-modal">Syntax</a>
+                            </li>
+                            <li>
+                                <a data-toggle="modal" href="#about-modal">About</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- /.navbar-collapse -->
                 </div>
-                <!-- /.navbar-collapse -->
-            </div>
-            <!-- /.container-fluid -->
-        </nav>
+                <!-- /.container-fluid -->
+            </nav>
+        </header>
 
-        <div class="container tab-content">
+        <section class="container tab-content">
             <button id="hidden" data-toggle="tab" data-target="#tab_explore"></button>
             <!-- About Modal -->
-            <div id="about-modal" class="modal fade" role="dialog">
+            <section id="about-modal" class="modal fade" role="dialog">
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -147,7 +149,8 @@
                                 <br/>
                                 <a href="https://sites.google.com/site/carlosolarte/">Carlos Olarte. </a>
                                 <br/>
-                                <br/> <b>Contact &#8678; Subtitle</b>
+                                <br/>
+                                <b>Contact &#8678; Subtitle</b>
                                 <br/>
                                 <a href="https://sites.google.com/site/carlosolarte/">Carlos Olarte </a>
 
@@ -159,10 +162,8 @@
                     </div>
 
                 </div>
-            </div>
-            <!--End About modal-->
-            <!-- Syntax Modal -->
-            <div id="syntax-modal" class="modal fade" role="dialog">
+            </section><!--About modal-->
+            <section id="syntax-modal" class="modal fade" role="dialog">
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -221,10 +222,9 @@
                     </div>
 
                 </div>
-            </div>
-            <!--End Syntax modal-->
+            </section> <!--Syntax modal-->
 
-            <div id="tab_edit" class="tab-pane fade in active">
+            <section id="tab_edit" class="tab-pane fade in active">
                 <div class="row">
                     <div class='loaderParse col-lg-4 col-lg-offset-4'></div>
                     <button class="btnParse btn btn-default pull-right" onclick="parsing('')" parse="">Parse</button>
@@ -237,21 +237,24 @@
                         </div>
                     </form>
                 </div>
-            </div>
-            <div id="tab_explore" class="tab-pane fade">
+            </section> <!-- EDIT -->
+            <section id="tab_explore" class="tab-pane fade">
                 <div id="graph_txt">
                     <!-- This is the text that will be updated -->
 
                 </div>
 
-            </div>
-            <div id="tab_verify" class="tab-pane fade">
+            </section> <!-- EXPLORE -->
+            <section id="tab_verify" class="tab-pane fade">
                 <div id="verify_list">
-                    <p>Under Construction.</p>
+                    <div>
+
+                    </div>
                 </div>
 
-            </div>
-        </div>
+            </section> <!-- VERIFY -->
+        </section> 
+    </main>
 
 </body>
 
