@@ -1,8 +1,11 @@
 /* INDEX */
-button#hidden{
+button.btn-hidden{
     display: none;
 }
 li#explore:hover{
+    cursor: pointer;
+}
+li#verify:hover{
     cursor: pointer;
 }
 span.challenge{
@@ -25,6 +28,9 @@ p.about-p{
 }
 ul.about-list li{
     margin-bottom: 0.3em; 
+}
+section.container-property div{
+    padding-left: 1.2em;
 }
 
 

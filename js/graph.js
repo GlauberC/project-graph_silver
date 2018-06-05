@@ -3,23 +3,38 @@ var inputFromEditUnmanipulated;
 var colorBackup;
 
 $(document).ready(function () {
-
+    // EXPLORE
     $("li#explore").click(function () {
         parsing('EXPLORER');
     })
 
-    $("button#hidden").click(function () {
+    $("button#hidden-explore").click(function () {
         $("li#explore").addClass("active");
         $("li#edit").removeClass("active");
+        $("li#verify").removeClass("active");
         showGraph("EXPLORE", null)
 
     })
+
+    // VERIFY
+    $("li#verify").click(function () {
+        parsing('VERIFY');
+    })
+
+    $("button#hidden-verify").click(function () {
+        $("li#verify").addClass("active");
+        $("li#edit").removeClass("active");
+        $("li#explore").removeClass("active");
+
+    })
+
+    // DROPDOWN
     $("a.exampleDropdown").click(function () {
         $("a#edit").click();
 
     })
 
-
+    // EDIT
     $("li#edit").click(function () {
         $('.btnParse').popover("destroy");
         $("div.loaderParse").html("");
@@ -30,6 +45,14 @@ $(document).ready(function () {
     $("textarea").click(function () {
         $('.btnParse').popover("destroy");
     })
+
+    // PROPERTY MODAL
+    $("input[name$='property-type']").click(function () {
+        var choice = $(this).val();
+
+        $("div.prop-option").hide();
+        $("#prop" + choice).show();
+    });
 
 });
 function initialScroll() {
@@ -147,7 +170,7 @@ function parseStringManipulation(request) {
     return request;
 }
 
-function parsing(explorer) {
+function parsing(action) {
     $("div.loaderParse").html("<div class='loader'></div>");
     $('.btnParse').popover("destroy");
     getinputFromEdit()
@@ -168,9 +191,12 @@ function parsing(explorer) {
                     html: true
                 });
             } else {
-                if (explorer == "EXPLORER") {
-                    $("button#hidden").click();
-                } else {
+                if (action == "EXPLORER") {
+                    $("button#hidden-explore").click();
+                } else if (action == "VERIFY") {
+                    $("button#hidden-verify").click();
+                }
+                else {
                     $('.btnParse').popover({
                         title: "<h4 style='color: green;'><span class='glyphicon glyphicon-ok'> &nbsp;</span>Success</h4>",
                         content: "Everything works fine",
