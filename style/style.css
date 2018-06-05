@@ -1,3 +1,4 @@
+/* INDEX */
 button#hidden{
     display: none;
 }
@@ -7,6 +8,28 @@ li#explore:hover{
 span.challenge{
     color: #b20113;
 }
+
+/* MODAL */
+div.modal-body h3{
+    font-size: 14pt;
+}
+div.modal-body td{
+    font-size: 11pt;
+}
+ul.about-list{
+    list-style-type: circle;
+}
+p.about-p{
+    text-align: justify;
+    font-size: 11pt;
+}
+ul.about-list li{
+    margin-bottom: 0.3em; 
+}
+
+
+
+/* GRAPH */
 .link {stroke: rgba(0, 0, 0, .8); stroke-opacity: .4; stroke-width: 1.6px;}
 div#info-node-link{
     margin: 2em;
@@ -24,6 +47,7 @@ svg{
     height: 2000px;
     
 }
+
 div#graph-container{
     overflow: scroll;
     height: 50vh;
@@ -34,12 +58,7 @@ div#graph-container{
     overflow-y: scroll;
 }
 
-div.modal-body h3{
-    font-size: 14pt;
-}
-div.modal-body td{
-    font-size: 11pt;
-}
+/* PARSE */
 button.btnParse{
     margin-bottom: 1em;
     margin-right: 3em;
@@ -48,7 +67,7 @@ button.btnParse{
     max-width: 40vw; /* Max Width of the popover (depending on the container!) */
 }
 
-/* loading */
+/* LOADING */
 .loader {
     border: 5px solid #f3f3f3;
     border-radius: 50%;
@@ -69,7 +88,7 @@ button.btnParse{
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
   }
-/* End loading */
+
 /* Textarea line. Found on  http://alan.blog-city.com/jquerylinedtextarea.htm*/
 
 textarea.lined{
@@ -123,4 +142,3 @@ textarea.lined{
 .linedwrap .codelines .lineselect {
 	color: red;
 }
-/* Close test  */
