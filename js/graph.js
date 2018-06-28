@@ -1,7 +1,7 @@
 var inputFromEdit; //input
 var inputFromEditUnmanipulated; //raw input
 var colorBackup; //in graph
-var choice = 0 //in property menu
+var choice //in property menu
 
 $(document).ready(function () {
     // EXPLORE
@@ -14,12 +14,17 @@ $(document).ready(function () {
         $("li#edit").removeClass("active");
         $("li#verify").removeClass("active");
         showGraph("EXPLORE", null)
-
     })
 
     // VERIFY
     $("li#verify").click(function () {
         parsing('VERIFY');
+    })
+    $("button#hidden-verify").click(function () {
+        $("li#verify").addClass("active");
+        $("li#edit").removeClass("active");
+        $("li#explore").removeClass("active");
+        propertyPhp()
     })
 
 
@@ -41,17 +46,25 @@ $(document).ready(function () {
         $('.btnParse').popover("destroy");
     })
 
-    // PROPERTY MODAL
-    $("input[name$='property-type']").click(function () {
-        choice = $(this).val();
-
-        $("div.prop-option").hide();
-        $("#prop" + choice).show();
-    });
-
-
-
 });
+
+function addPropClick(){
+  $(".radioProp").prop("checked", false)
+  $("div.prop-option").hide();
+  $("button.btn-prop-save").addClass('disabled');
+}
+function propEquivalence(){
+  $("button.btn-prop-save").removeClass('disabled');
+  $("div#propMod").hide();
+  $("div#propEqui").show();
+  choice=0
+}
+function propModel(){
+  $("button.btn-prop-save").removeClass('disabled');
+  $("div#propEqui").hide();
+  $("div#propMod").show();
+  choice=1
+}
 
 function savebtn(){
   console.log(choice);
@@ -93,6 +106,29 @@ function stringManipulation(string) {
 }
 // === Ajax - parse function
 
+function propertyPhp(){
+  getinputFromEdit();
+  $("div.loaderParse").html("<div class='loader'></div>");
+
+  // Getting the input from the user
+
+  var txt = inputFromEdit;
+  // The Ajax invocation
+  var xhttp = new XMLHttpRequest();
+  txt = "EXPLORE=>" + "FIRST" + '=>' + txt;
+  xhttp.onreadystatechange = function () {
+      if (this.readyState == 4 && this.status == 200) {
+          // When create_graph.php finishes, we can recover its output by using the responseText field
+          // I used the content of create_graph.php to update the text "graph_txt"
+          $("div#verifyPHP")[0].innerHTML = this.responseText;
+          graph();
+      }
+  };
+  // Note that the URL is create_graph.php and I use "?txt" to send the needed parameter (the input from the user)
+  xhttp.open("GET", "php/verify.php?txt=" + encodeURIComponent(txt), true);
+  // Calling create_graph.php
+  xhttp.send();
+}
 
 //  === Ajax, send from textarea to Maude command Function ===
 function showGraph(type, self) {
