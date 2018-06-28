@@ -1,6 +1,7 @@
-var inputFromEdit;
-var inputFromEditUnmanipulated;
-var colorBackup;
+var inputFromEdit; //input
+var inputFromEditUnmanipulated; //raw input
+var colorBackup; //in graph
+var choice = 0 //in property menu
 
 $(document).ready(function () {
     // EXPLORE
@@ -21,12 +22,6 @@ $(document).ready(function () {
         parsing('VERIFY');
     })
 
-    $("button#hidden-verify").click(function () {
-        $("li#verify").addClass("active");
-        $("li#edit").removeClass("active");
-        $("li#explore").removeClass("active");
-
-    })
 
     // DROPDOWN
     $("a.exampleDropdown").click(function () {
@@ -48,13 +43,20 @@ $(document).ready(function () {
 
     // PROPERTY MODAL
     $("input[name$='property-type']").click(function () {
-        var choice = $(this).val();
+        choice = $(this).val();
 
         $("div.prop-option").hide();
         $("#prop" + choice).show();
     });
 
+
+
 });
+
+function savebtn(){
+  console.log(choice);
+}
+
 function initialScroll() {
     $('div#graph-container').scrollTop(550);
     $('div#graph-container').scrollLeft(300);
@@ -84,7 +86,7 @@ function stringManipulation(string) {
     string = string.replace(/#.+\n/ig, "");                 //remove comments
     string = string.replace(/\n#.+/ig, "");                 //remove if ending with comment
     string = string.replace(/\n/g, ';');                    //replace \n to ;
-    string = string.replace(/([a-z]\w*)/ig, " \'$1 ");      //add ' before process 
+    string = string.replace(/([a-z]\w*)/ig, " \'$1 ");      //add ' before process
     string = string.replace(/\'(tau)/g, "$1");              //remove ' from tau special char
     string = string.replace(/=/ig, " =d= ");                //replace = to =d=
     return string;
@@ -333,7 +335,7 @@ function graph() {
 
             .text(function (d) { return d.type });
 
-        //It creates nodes    
+        //It creates nodes
         node = svg.selectAll(".node")
             .data(nodes)
             .enter()
