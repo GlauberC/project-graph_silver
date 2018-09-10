@@ -17,11 +17,12 @@ echo "
                     <th>Edit</th>
                     <th>Delete</th>
                   </thead>
-                  <tbody>
+                  <tbody class='verify-list'>
 
                   </tbody>
 
                 </table>
+
               </div>
             </div>
             <section id='property-modal' class='container-property container modal fade' role='dialog'>
@@ -48,22 +49,28 @@ echo "
                           <div class = 'left-process col-lg-6'>
                             <label for='left'>Left process</label><br/>
                             <select id = 'leftp' class = 'btn btn-default'>
-                              <option>Process 1</option>
-                              <option>Process 2</option>
-                              <option>Process 3</option>
+                            ";
+                            foreach ($select as $process_label) {
+                                        $process_label = str_replace('\'', '', $process_label);
+                                        echo "<option>$process_label</option>";
+                            }
+                        echo "
                             </select>
                           </div>
                           <div class = 'right-process col-lg-6'>
                             <label for='right'>Right process</label><br/>
                             <select id = 'rightp' class = 'btn btn-default'>
-                              <option>Process 1</option>
-                              <option>Process 2</option>
-                              <option>Process 3</option>
+                            ";
+                            foreach ($select as $process_label) {
+                                        $process_label = str_replace('\'', '', $process_label);
+                                        echo "<option>$process_label</option>";
+                            }
+                            echo "
                             </select>
                           </div>
                           <div class='prop form-group col-lg-8'>
                             <label for='property-id'>Property ID:</label>
-                            <input type='text' class='form-control' id='property-id'>
+                            <input type='text' class='form-control property-id'>
                           </div>
                         </div>
                       </div>
@@ -74,10 +81,13 @@ echo "
                       <div>
                         <div class = 'left-model-process col-lg-3'>
                           <label for='left'>Left process</label><br/>
-                          <select id = 'leftp' class = 'btn btn-default'>
-                            <option>Process 1</option>
-                            <option>Process 2</option>
-                            <option>Process 3</option>
+                          <select id = 'leftp' class = 'btn btn-default model-process-select'>
+                          ";
+                          foreach ($select as $process_label) {
+                                      $process_label = str_replace('\'', '', $process_label);
+                                      echo "<option>$process_label</option>";
+                          }
+                          echo "
                           </select>
                         </div>
                         <div class = 'left-model-process col-lg-1'>
@@ -85,14 +95,14 @@ echo "
                         </div>
                         <div class = 'right-process col-lg-8'>
                           <label for='property-id'>Formula</label>
-                          <input type='text' class='form-control' id='formula-id'>
+                          <input type='text' class='form-control formula-id'>
                         </div>
                       </div>
                     </div>
                   </div>
                   <div class='modal-footer'>
                     <button type='button' class='btn-prop btn btn-default' data-dismiss='modal'>Cancel</button>
-                    <button type='button' class='btn-prop btn-prop-save btn btn-primary' onclick='savebtn()'>Save</button>
+                    <button type='button' class='btn-prop btn-prop-save btn btn-primary' onclick='savebtn()' data-dismiss='modal'>Save</button>
                   </div>
                 </div>
 

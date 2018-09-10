@@ -67,7 +67,24 @@ function propModel(){
 }
 
 function savebtn(){
-  console.log(choice);
+  var prop;
+  if(choice == 0){
+    prop = $(".property-id").val();
+    $('.verify-list').append("<tr><td> <span class='glyphicon glyphicon-option-horizontal'></span> </td>" +
+    "<td> <span class='glyphicon glyphicon-option-horizontal'></span> </td>" +
+    "<td>"+ prop +"</td>" +
+    "<td><span class='glyphicon glyphicon-play-circle btn btn-sm'></span></td>" +
+    "<td><span class='glyphicon glyphicon-pencil btn btn-sm'></span></td>" +
+    "<td><span class='glyphicon glyphicon-trash btn btn-sm'></span></td></tr>");
+  }else if(choice == 1){
+    prop = $(".model-process-select").val() + "  =  " + $(".formula-id").val();
+    $('.verify-list').append("<tr><td> <span class='glyphicon glyphicon-option-horizontal'></span> </td>" +
+    "<td> <span class='glyphicon glyphicon-option-horizontal'></span> </td>" +
+    "<td>"+ prop +"</td>" +
+    "<td><span class='glyphicon glyphicon-play-circle btn btn-sm'></span></td>" +
+    "<td><span class='glyphicon glyphicon-pencil btn btn-sm'></span></td>" +
+    "<td><span class='glyphicon glyphicon-trash btn btn-sm'></span></td></tr>");
+  }
 }
 
 function initialScroll() {
