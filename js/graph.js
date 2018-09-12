@@ -2,6 +2,8 @@ var inputFromEdit; //input
 var inputFromEditUnmanipulated; //raw input
 var colorBackup; //in graph
 var choice //in property menu
+var nVerifyList;
+
 
 $(document).ready(function () {
     // EXPLORE
@@ -66,14 +68,29 @@ function propModel(){
   choice=1
 }
 
+function edit_bissimulation_command(process){
+  // recover the process line
+  list = inputFromEdit.split(';');
+  for(var i = 0; i<list.length; i++ ){
+    if(list[i].trim().startsWith(process)){
+      p = list[i].trim()
+    }
+  }
+  return p
+}
+
 function savebtn(){
   var prop;
   if(choice == 0){
+
+    // create a new element to verify table
+    var process1 = $('.bissim-process1').val();
+    var process2 = $('.bissim-process2').val();
     prop = $(".property-id").val();
-    $('.verify-list').append("<tr><td> <span class='glyphicon glyphicon-option-horizontal'></span> </td>" +
-    "<td> <span class='glyphicon glyphicon-option-horizontal'></span> </td>" +
+    $('.verify-list').append("<tr><td class='test status"+nVerifyList+"'> <span class='glyphicon glyphicon-option-horizontal'></span> </td>" +
+    "<td> <span class='glyphicon glyphicon-option-horizontal time"+nVerifyList+"'></span> </td>" +
     "<td>"+ prop +"</td>" +
-    "<td><span class='glyphicon glyphicon-play-circle btn btn-sm'></span></td>" +
+    "<td class = 'verify"+nVerifyList+"' process1 = '"+process1+"' process2 = '"+process2+"'><span class='glyphicon glyphicon-play-circle btn btn-sm' onClick='verify_action("+ nVerifyList+")'></span></td>" +
     "<td><span class='glyphicon glyphicon-pencil btn btn-sm'></span></td>" +
     "<td><span class='glyphicon glyphicon-trash btn btn-sm'></span></td></tr>");
   }else if(choice == 1){
@@ -85,6 +102,16 @@ function savebtn(){
     "<td><span class='glyphicon glyphicon-pencil btn btn-sm'></span></td>" +
     "<td><span class='glyphicon glyphicon-trash btn btn-sm'></span></td></tr>");
   }
+  nVerifyList++;
+}
+function verify_action(n){
+  process1 = $('.verify' + n).attr('process1');
+  process2 = $('.verify' + n).attr('process2');
+  var maude = "red in BISIMULATION : bisimilar? ({\'"+ process1 + "}, {\'"+ process2 + "} ,("+ inputFromEdit.replace(';',',') +")) .";
+  console.log(maude);
+  // change status
+  $('.status' + n).html('change');
+
 }
 
 function initialScroll() {
@@ -124,6 +151,7 @@ function stringManipulation(string) {
 // === Ajax - parse function
 
 function propertyPhp(){
+  nVerifyList = 0
   getinputFromEdit();
   $("div.loaderParse").html("<div class='loader'></div>");
 

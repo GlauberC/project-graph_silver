@@ -48,7 +48,7 @@ echo "
                         <div>
                           <div class = 'left-process col-lg-6'>
                             <label for='left'>Left process</label><br/>
-                            <select id = 'leftp' class = 'btn btn-default'>
+                            <select id = 'leftp' class = 'btn btn-default bissim-process1'>
                             ";
                             foreach ($select as $process_label) {
                                         $process_label = str_replace('\'', '', $process_label);
@@ -59,7 +59,7 @@ echo "
                           </div>
                           <div class = 'right-process col-lg-6'>
                             <label for='right'>Right process</label><br/>
-                            <select id = 'rightp' class = 'btn btn-default'>
+                            <select id = 'rightp' class = 'btn btn-default bissim-process2'>
                             ";
                             foreach ($select as $process_label) {
                                         $process_label = str_replace('\'', '', $process_label);
