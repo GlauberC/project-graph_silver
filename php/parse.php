@@ -1,6 +1,6 @@
 <?php
 //Maude's directory
-$DIR_MAUDE = exec('which maude');  //<- YOU MUST CHANGE HERE
+$DIR_MAUDE = exec('which maude');  
 $DIR_FILE_MAUDE = "../system/semantics.maude";
 $MODF = "-no-banner";
 

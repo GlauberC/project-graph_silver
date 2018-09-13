@@ -68,17 +68,6 @@ function propModel(){
   choice=1
 }
 
-function edit_bissimulation_command(process){
-  // recover the process line
-  list = inputFromEdit.split(';');
-  for(var i = 0; i<list.length; i++ ){
-    if(list[i].trim().startsWith(process)){
-      p = list[i].trim()
-    }
-  }
-  return p
-}
-
 function savebtn(){
   var prop;
   if(choice == 0){
@@ -87,8 +76,8 @@ function savebtn(){
     var process1 = $('.bissim-process1').val();
     var process2 = $('.bissim-process2').val();
     prop = $(".property-id").val();
-    $('.verify-list').append("<tr><td class='test status"+nVerifyList+"'> <span class='glyphicon glyphicon-option-horizontal'></span> </td>" +
-    "<td> <span class='glyphicon glyphicon-option-horizontal time"+nVerifyList+"'></span> </td>" +
+    $('.verify-list').append("<tr><td class='status"+nVerifyList+"'> <span class='glyphicon glyphicon-option-horizontal'></span> </td>" +
+    "<td class = 'time"+nVerifyList+"'> <span class='glyphicon glyphicon-option-horizontal'></span> </td>" +
     "<td>"+ prop +"</td>" +
     "<td class = 'verify"+nVerifyList+"' process1 = '"+process1+"' process2 = '"+process2+"'><span class='glyphicon glyphicon-play-circle btn btn-sm' onClick='verify_action("+ nVerifyList+")'></span></td>" +
     "<td><span class='glyphicon glyphicon-pencil btn btn-sm'></span></td>" +
@@ -104,13 +93,31 @@ function savebtn(){
   }
   nVerifyList++;
 }
+function verify_action_php(Command, classStatus){
+  'Method get to boton verify'
+  // The Ajax invocation
+
+  $.ajax({
+    type: "GET",
+    data: { txt: Command },
+    url: 'php/verify-action.php',
+    success: function (request) {
+      $(classStatus).html(request);
+    }
+  });
+}
+
 function verify_action(n){
   process1 = $('.verify' + n).attr('process1');
   process2 = $('.verify' + n).attr('process2');
-  var maude = "red in BISIMULATION : bisimilar? ({\'"+ process1 + "}, {\'"+ process2 + "} ,("+ inputFromEdit.replace(';',',') +")) .";
-  console.log(maude);
+  var maude = "red in BISIMULATION : bisimilar? ({\'"+ process1 + "}, {\'"+ process2 + "} ,("+ inputFromEdit.replace(/;/ig,',') +")) .";
+
   // change status
-  $('.status' + n).html('change');
+  var classStatus = '.status' + n
+  var classTime = '.time' + n
+  $(classTime).html("<div class='mini-loader'></div>");
+  console.log(maude)
+  verify_action_php(maude, classStatus);
 
 }
 
@@ -166,7 +173,6 @@ function propertyPhp(){
           // When create_graph.php finishes, we can recover its output by using the responseText field
           // I used the content of create_graph.php to update the text "graph_txt"
           $("div#verifyPHP")[0].innerHTML = this.responseText;
-          graph();
       }
   };
   // Note that the URL is create_graph.php and I use "?txt" to send the needed parameter (the input from the user)

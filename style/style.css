@@ -86,6 +86,15 @@ button.btnParse{
     -webkit-animation: spin 1s linear infinite; /* Safari */
     animation: spin 1s linear infinite;
   }
+  .mini-loader {
+      border: 5px solid #f3f3f3;
+      border-radius: 50%;
+      border-top: 5px solid #3498db;
+      width: 20px;
+      height: 20px;
+      -webkit-animation: spin 1s linear infinite; /* Safari */
+      animation: spin 1s linear infinite;
+    }
 
   /* Safari */
   @-webkit-keyframes spin {
