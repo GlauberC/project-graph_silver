@@ -88,7 +88,7 @@ echo "
                   <div>
                     <div class = 'left-model-process col-lg-3'>
                         <label for='left'>Left process</label><br/>
-                        <select id = 'leftp' class = 'btn btn-default model-process-select'>";
+                        <select id = 'leftp' class = 'btn btn-default model-process-select model-process'>";
                             foreach ($select as $process_label) {
                                 $process_label = str_replace('\'', '', $process_label);
                                 echo "<option>$process_label</option>";
@@ -118,4 +118,5 @@ echo "
               </div>
 
             </section>";
+            echo "<div class = 'test'>Test</div> "; //deletar after test Model check
 ?>

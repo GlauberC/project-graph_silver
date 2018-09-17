@@ -79,15 +79,18 @@ function savebtn(){
     $('.verify-list').append("<tr><td class='status"+nVerifyList+"'> <span class='glyphicon glyphicon-option-horizontal'></span> </td>" +
     "<td class = 'time"+nVerifyList+"'> <span class='glyphicon glyphicon-option-horizontal'></span> </td>" +
     "<td>"+ prop +"</td>" +
-    "<td class = 'verify"+nVerifyList+"' process1 = '"+process1+"' process2 = '"+process2+"'><span class='glyphicon glyphicon-play-circle btn btn-sm' onClick='verify_action("+ nVerifyList+")'></span></td>" +
+    "<td class = 'verify"+nVerifyList+"' process1 = '"+process1+"' process2 = '"+process2+"'><span class='glyphicon glyphicon-play-circle btn btn-sm' onClick='verify_action("+ nVerifyList+", \"bissi\")'></span></td>" +
     "<td><span class='glyphicon glyphicon-pencil btn btn-sm'></span></td>" +
     "<td><span class='glyphicon glyphicon-trash btn btn-sm'></span></td></tr>");
   }else if(choice == 1){
+    // TODO "Receber o Model_check_option também", Adicionar o ' antes dos process na formula
+    var processModel = $('.model-process').val();
+    var formula = $('.formula-id').val();
     prop = $(".model-process-select").val() + "  =  " + $(".formula-id").val();
-    $('.verify-list').append("<tr><td> <span class='glyphicon glyphicon-option-horizontal'></span> </td>" +
-    "<td> <span class='glyphicon glyphicon-option-horizontal'></span> </td>" +
+    $('.verify-list').append("<tr><td class='status"+nVerifyList+"'> <span class='glyphicon glyphicon-option-horizontal'></span> </td>" +
+    "<td class = 'time"+nVerifyList+"'> <span class='glyphicon glyphicon-option-horizontal'></span> </td>" +
     "<td>"+ prop +"</td>" +
-    "<td><span class='glyphicon glyphicon-play-circle btn btn-sm'></span></td>" +
+    "<td class = 'verify"+nVerifyList+"' processModel = '"+processModel+"' formula = '"+formula+"'><span class='glyphicon glyphicon-play-circle btn btn-sm' onClick='verify_action("+ nVerifyList+", \"model\")'></span></td>" +
     "<td><span class='glyphicon glyphicon-pencil btn btn-sm'></span></td>" +
     "<td><span class='glyphicon glyphicon-trash btn btn-sm'></span></td></tr>");
   }
@@ -107,17 +110,27 @@ function verify_action_php(Command, classStatus){
   });
 }
 
-function verify_action(n){
-  process1 = $('.verify' + n).attr('process1');
-  process2 = $('.verify' + n).attr('process2');
-  var maude = "red in BISIMULATION : bisimilar? ({\'"+ process1 + "}, {\'"+ process2 + "} ,("+ inputFromEdit.replace(/;/ig,',') +")) .";
+function verify_action(n, func){
+  if(func == "bissi"){
+    process1 = $('.verify' + n).attr('process1');
+    process2 = $('.verify' + n).attr('process2');
+    var maude = "red in BISIMULATION : bisimilar? ({\'"+ process1 + "}, {\'"+ process2 + "} ,("+ inputFromEdit.replace(/;/ig,',') +")) .";
+  }else{
+    model_option = "tt"
+    processModel = $('.verify' + n).attr('processModel');
+    formula = $('.verify' + n).attr('formula');
+    formula = formula.replace(/([a-z]\w*)/ig, " \'$1 ");      //add ' before process
+    var maude = "red in SLML_MC : modelCheck({\'"+ processModel + "},"+ inputFromEdit.replace(/;/ig,',') +", << "+ formula +" >> "+ model_option +") .";
+  }
+
 
   // change status
   var classStatus = '.status' + n
   var classTime = '.time' + n
   $(classTime).html("<div class='mini-loader'></div>");
   console.log(maude)
-  verify_action_php(maude, classStatus);
+  // verify_action_php(maude, classStatus);
+  verify_action_php(maude, '.test')
 
 }
 
