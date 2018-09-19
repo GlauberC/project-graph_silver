@@ -1,17 +1,19 @@
 function addPropClick(){
+  $('.property-id').val('');
+  $('.formula-id').val('');
   $(".radioProp").prop("checked", false)
   $("div.prop-option").hide();
   $("button.btn-prop-save").addClass('disabled');
 }
-function propEquivalence(){
+function propBisimulation(){
   $("button.btn-prop-save").removeClass('disabled');
   $("div#propMod").hide();
-  $("div#propEqui").show();
+  $("div#propBisim").show();
   choice=0
 }
 function propModel(){
   $("button.btn-prop-save").removeClass('disabled');
-  $("div#propEqui").hide();
+  $("div#propBisim").hide();
   $("div#propMod").show();
   choice=1
 }
@@ -55,7 +57,6 @@ function savebtn(){
     "<td><span class='glyphicon glyphicon-pencil btn btn-sm'></span></td>" +
     "<td><span class='glyphicon glyphicon-trash btn btn-sm' onClick='verify_delete("+ nVerifyList+")'></span></td></tr>");
   }else if(choice == 1){
-    console.log('Test');
     var processModel = $('.model-process').val();
     var formula = $('.formula-id').val();
     prop = $(".model-process-select").val() + "  =  " + $(".formula-id").val();

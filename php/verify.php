@@ -37,13 +37,13 @@ echo "
                   <h3>Property Type</h3>
                   <div class='radio'>
                     <label>
-                      <input id='equivalence' class='radioProp' type='radio' name='property-type' value='0' onClick='propEquivalence()'>Equivalence/Preorder Checking
+                      <input id='bissimulation' class='radioProp' type='radio' name='property-type' value='0' onClick='propBisimulation()'>Network Bisimulation</input>
                     </label>
                   </div>
 
                   <div class='radio'>
                     <label>
-                      <input id='model' class='radioProp' type='radio' name='property-type' value='1' onClick='propModel()'>Model Checking
+                      <input id='model' class='radioProp' type='radio' name='property-type' value='1' onClick='propModel()'>Model Checking</input>
                     </label>
                   </div>
 
@@ -51,8 +51,8 @@ echo "
 
 
 
-                <div id='propEqui' class='prop-option'>
-                  <div class='selected-equivalence row'>
+                <div id='propBisim' class='prop-option'>
+                  <div class='selected-bisimulation row'>
                     <div>
                       <div class = 'left-process col-lg-6'>
                         <label for='left'>Left process</label><br/>
