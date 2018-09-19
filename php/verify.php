@@ -118,5 +118,4 @@ echo "
               </div>
 
             </section>";
-            echo "<div class = 'test'>Test</div> "; //deletar after test Model check
 ?>

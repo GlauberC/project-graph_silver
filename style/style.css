@@ -12,6 +12,7 @@ span.challenge{
     color: #b20113;
 }
 
+
 /* MODAL */
 div.modal-body h3{
     font-size: 14pt;
@@ -36,6 +37,10 @@ section.container-property div{
 /* Verify */
 .prop{
   margin-top: 15px;
+}
+
+.verify-list td{
+  font-size: 16px;
 }
 
 /* GRAPH */

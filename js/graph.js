@@ -50,23 +50,7 @@ $(document).ready(function () {
 
 });
 
-function addPropClick(){
-  $(".radioProp").prop("checked", false)
-  $("div.prop-option").hide();
-  $("button.btn-prop-save").addClass('disabled');
-}
-function propEquivalence(){
-  $("button.btn-prop-save").removeClass('disabled');
-  $("div#propMod").hide();
-  $("div#propEqui").show();
-  choice=0
-}
-function propModel(){
-  $("button.btn-prop-save").removeClass('disabled');
-  $("div#propEqui").hide();
-  $("div#propMod").show();
-  choice=1
-}
+
 
 function savebtn(){
   var prop;
@@ -96,43 +80,8 @@ function savebtn(){
   }
   nVerifyList++;
 }
-function verify_action_php(Command, classStatus){
-  'Method get to boton verify'
-  // The Ajax invocation
-
-  $.ajax({
-    type: "GET",
-    data: { txt: Command },
-    url: 'php/verify-action.php',
-    success: function (request) {
-      $(classStatus).html(request);
-    }
-  });
-}
-
-function verify_action(n, func){
-  if(func == "bissi"){
-    process1 = $('.verify' + n).attr('process1');
-    process2 = $('.verify' + n).attr('process2');
-    var maude = "red in BISIMULATION : bisimilar? ({\'"+ process1 + "}, {\'"+ process2 + "} ,("+ inputFromEdit.replace(/;/ig,',') +")) .";
-  }else{
-    model_option = "tt"
-    processModel = $('.verify' + n).attr('processModel');
-    formula = $('.verify' + n).attr('formula');
-    formula = formula.replace(/([a-z]\w*)/ig, " \'$1 ");      //add ' before process
-    var maude = "red in SLML_MC : modelCheck({\'"+ processModel + "},"+ inputFromEdit.replace(/;/ig,',') +", << "+ formula +" >> "+ model_option +") .";
-  }
 
 
-  // change status
-  var classStatus = '.status' + n
-  var classTime = '.time' + n
-  $(classTime).html("<div class='mini-loader'></div>");
-  console.log(maude)
-  // verify_action_php(maude, classStatus);
-  verify_action_php(maude, '.test')
-
-}
 
 function initialScroll() {
     $('div#graph-container').scrollTop(550);
@@ -170,29 +119,7 @@ function stringManipulation(string) {
 }
 // === Ajax - parse function
 
-function propertyPhp(){
-  nVerifyList = 0
-  getinputFromEdit();
-  $("div.loaderParse").html("<div class='loader'></div>");
 
-  // Getting the input from the user
-
-  var txt = inputFromEdit;
-  // The Ajax invocation
-  var xhttp = new XMLHttpRequest();
-  txt = "EXPLORE=>" + "FIRST" + '=>' + txt;
-  xhttp.onreadystatechange = function () {
-      if (this.readyState == 4 && this.status == 200) {
-          // When create_graph.php finishes, we can recover its output by using the responseText field
-          // I used the content of create_graph.php to update the text "graph_txt"
-          $("div#verifyPHP")[0].innerHTML = this.responseText;
-      }
-  };
-  // Note that the URL is create_graph.php and I use "?txt" to send the needed parameter (the input from the user)
-  xhttp.open("GET", "php/verify.php?txt=" + encodeURIComponent(txt), true);
-  // Calling create_graph.php
-  xhttp.send();
-}
 
 //  === Ajax, send from textarea to Maude command Function ===
 function showGraph(type, self) {
