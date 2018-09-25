@@ -50,39 +50,6 @@ $(document).ready(function () {
 
 });
 
-
-
-function savebtn(){
-  var prop;
-  if(choice == 0){
-
-    // create a new element to verify table
-    var process1 = $('.bissim-process1').val();
-    var process2 = $('.bissim-process2').val();
-    prop = $(".property-id").val();
-    $('.verify-list').append("<tr><td class='status"+nVerifyList+"'> <span class='glyphicon glyphicon-option-horizontal'></span> </td>" +
-    "<td class = 'time"+nVerifyList+"'> <span class='glyphicon glyphicon-option-horizontal'></span> </td>" +
-    "<td>"+ prop +"</td>" +
-    "<td class = 'verify"+nVerifyList+"' process1 = '"+process1+"' process2 = '"+process2+"'><span class='glyphicon glyphicon-play-circle btn btn-sm' onClick='verify_action("+ nVerifyList+", \"bissi\")'></span></td>" +
-    "<td><span class='glyphicon glyphicon-pencil btn btn-sm'></span></td>" +
-    "<td><span class='glyphicon glyphicon-trash btn btn-sm'></span></td></tr>");
-  }else if(choice == 1){
-    // TODO "Receber o Model_check_option também", Adicionar o ' antes dos process na formula
-    var processModel = $('.model-process').val();
-    var formula = $('.formula-id').val();
-    prop = $(".model-process-select").val() + "  =  " + $(".formula-id").val();
-    $('.verify-list').append("<tr><td class='status"+nVerifyList+"'> <span class='glyphicon glyphicon-option-horizontal'></span> </td>" +
-    "<td class = 'time"+nVerifyList+"'> <span class='glyphicon glyphicon-option-horizontal'></span> </td>" +
-    "<td>"+ prop +"</td>" +
-    "<td class = 'verify"+nVerifyList+"' processModel = '"+processModel+"' formula = '"+formula+"'><span class='glyphicon glyphicon-play-circle btn btn-sm' onClick='verify_action("+ nVerifyList+", \"model\")'></span></td>" +
-    "<td><span class='glyphicon glyphicon-pencil btn btn-sm'></span></td>" +
-    "<td><span class='glyphicon glyphicon-trash btn btn-sm'></span></td></tr>");
-  }
-  nVerifyList++;
-}
-
-
-
 function initialScroll() {
     $('div#graph-container').scrollTop(550);
     $('div#graph-container').scrollLeft(300);

@@ -42,6 +42,19 @@ section.container-property div{
 .verify-list td{
   font-size: 16px;
 }
+input.property-id{
+  font-weight: bold;
+  font-size: 1.2em;
+}
+textarea.formula-id{
+  resize:vertical;
+  width: 80%;
+  font-weight: bold;
+  font-size: 1.2em;
+}
+.formula-write-buttons{
+  margin-top: 10px;
+}
 
 /* GRAPH */
 .link {stroke: rgba(0, 0, 0, .8); stroke-opacity: .4; stroke-width: 1.6px;}

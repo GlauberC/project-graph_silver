@@ -100,10 +100,21 @@ echo "
                          <h3 class='equal-definition'>=</h3>
                      </div>
 
-                     <div class = 'right-process col-lg-8'>
+                     <div class = 'right-process col-lg-8 form-group'>
                         <label for='property-id'>Formula</label>
-                        <input type='text' class='form-control formula-id'>
+                        <textarea rows='1' cols='10' id='textareaid' class='formula-id form-control'></textarea>
+
+                        <div class = 'formula-write-buttons'>
+                         <label for='property-id'>tips:   </label>
+                         <button class = 'btn btn-default btn-sm' onClick='insert_on_formulaTXT(\"textareaid\", \" tt \")'>true</button>
+                         <button class = 'btn btn-default btn-sm' onClick='insert_on_formulaTXT(\"textareaid\", \" ff \")'>false</button>
+                         <button class = 'btn btn-default btn-sm' onClick='insert_on_formulaTXT(\"textareaid\", \" (  ) AND (  ) \")'>and</button>
+                         <button class = 'btn btn-default btn-sm' onClick='insert_on_formulaTXT(\"textareaid\", \" (  ) or (  ) \")'>or</button>
+                         <button class = 'btn btn-default btn-sm' onClick='insert_on_formulaTXT(\"textareaid\", \" [[ ANY ]] (  ) \")'>necessity</button>
+                         <button class = 'btn btn-default btn-sm' onClick='insert_on_formulaTXT(\"textareaid\", \" << ANY >> (  ) \")'>possibility</button>
+                        </div>
                      </div>
+
 
                    </div>
 
