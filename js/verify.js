@@ -59,7 +59,7 @@ function savebtn(){
   }else if(choice == 1){
     var processModel = $('.model-process').val();
     var formula = $('.formula-id').val();
-    prop = $(".model-process-select").val() + "  =  " + $(".formula-id").val();
+    prop = $(".model-process-select").val() + "&nbsp;&nbsp;|=&nbsp;&nbsp;" + $(".formula-id").val();
     $('.verify-list').append("<tr class = 'element"+nVerifyList+"'><td class='status"+nVerifyList+"'> <span class='glyphicon glyphicon-option-horizontal'></span> </td>" +
     "<td class = 'time"+nVerifyList+"'> <span class='glyphicon glyphicon-option-horizontal'></span> </td>" +
     "<td>"+ prop +"</td>" +

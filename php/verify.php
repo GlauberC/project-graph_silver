@@ -97,7 +97,7 @@ echo "
                      </div>
 
                      <div class = 'left-model-process col-lg-1'>
-                         <h3 class='equal-definition'>=</h3>
+                         <img src='icon/definition.ico' class = 'definition-icon'/>
                      </div>
 
                      <div class = 'right-process col-lg-8 form-group'>

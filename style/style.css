@@ -55,6 +55,11 @@ textarea.formula-id{
 .formula-write-buttons{
   margin-top: 10px;
 }
+.definition-icon{
+  margin-top: 30px;
+  width: 24px;
+  height: 24px;
+}
 
 /* GRAPH */
 .link {stroke: rgba(0, 0, 0, .8); stroke-opacity: .4; stroke-width: 1.6px;}
