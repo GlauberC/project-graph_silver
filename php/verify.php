@@ -113,6 +113,8 @@ echo "
                          <button class = 'btn btn-default btn-sm' onClick='insert_on_formulaTXT(\"textareaid\", \" [[ ANY ]] (  ) \")'>necessity</button>
                          <button class = 'btn btn-default btn-sm' onClick='insert_on_formulaTXT(\"textareaid\", \" << ANY >> (  ) \")'>possibility</button>
                         </div>
+                        <div class = 'parse-model-check'>
+                        </div>
                      </div>
 
 
@@ -125,7 +127,7 @@ echo "
 
               <div class='modal-footer'>
                     <button type='button' class='btn-prop btn btn-default' data-dismiss='modal'>Cancel</button>
-                    <button type='button' class='btn-prop btn-prop-save btn btn-primary' onclick='savebtn()' data-dismiss='modal'>Save</button>
+                    <button type='button' class='btn-prop btn-prop-save btn btn-primary' onclick='savebtn()'>Save</button>
               </div>
 
             </section>";

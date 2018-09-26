@@ -41,7 +41,9 @@ function propertyPhp(){
   // Calling create_graph.php
   xhttp.send();
 }
-
+function closeModal(){
+  $('#property-modal').modal('toggle');
+}
 function savebtn(){
   var prop;
   if(choice == 0){
@@ -56,29 +58,53 @@ function savebtn(){
     "<td class = 'verify"+nVerifyList+"' process1 = '"+process1+"' process2 = '"+process2+"'><span class='glyphicon glyphicon-play-circle btn btn-sm' onClick='verify_action("+ nVerifyList+", \"bissi\")'></span></td>" +
     "<td><span class='glyphicon glyphicon-pencil btn btn-sm'></span></td>" +
     "<td><span class='glyphicon glyphicon-trash btn btn-sm' onClick='verify_delete("+ nVerifyList+")'></span></td></tr>");
+    nVerifyList++;
+    closeModal();
   }else if(choice == 1){
     var processModel = $('.model-process').val();
     var formula = $('.formula-id').val();
-    prop = $(".model-process-select").val() + "&nbsp;&nbsp;|=&nbsp;&nbsp;" + $(".formula-id").val();
-    $('.verify-list').append("<tr class = 'element"+nVerifyList+"'><td class='status"+nVerifyList+"'> <span class='glyphicon glyphicon-option-horizontal'></span> </td>" +
-    "<td class = 'time"+nVerifyList+"'> <span class='glyphicon glyphicon-option-horizontal'></span> </td>" +
-    "<td>"+ prop +"</td>" +
-    "<td class = 'verify"+nVerifyList+"' processModel = '"+processModel+"' formula = '"+formula+"'><span class='glyphicon glyphicon-play-circle btn btn-sm' onClick='verify_action("+ nVerifyList+", \"model\")'></span></td>" +
-    "<td><span class='glyphicon glyphicon-pencil btn btn-sm'></span></td>" +
-    "<td><span class='glyphicon glyphicon-trash btn btn-sm' onClick='verify_delete("+ nVerifyList+")'></span></td></tr>");
+    var command = "parse " + formula_adjust(formula) + " .";
+
+
+
+    $.ajax({
+      type: "GET",
+      data: { txt: command },
+      url: 'php/parse-model-check.php',
+      success: function (request) {
+        console.log(request);
+        if(request.includes("bad token")){
+          re = /bad\stoken.+/i;
+          error = request.match(re) ;
+          $('.parse-model-check').html("<div class='alert alert-danger'><strong>Syntax Error: </strong>"+ error +"</div>");
+        }else{
+          prop = $(".model-process-select").val() + "&nbsp;&nbsp;|=&nbsp;&nbsp;" + $(".formula-id").val();
+          $('.verify-list').append("<tr class = 'element"+nVerifyList+"'><td class='status"+nVerifyList+"'> <span class='glyphicon glyphicon-option-horizontal'></span> </td>" +
+          "<td class = 'time"+nVerifyList+"'> <span class='glyphicon glyphicon-option-horizontal'></span> </td>" +
+          "<td>"+ prop +"</td>" +
+          "<td class = 'verify"+nVerifyList+"' processModel = '"+processModel+"' formula = '"+formula+"'><span class='glyphicon glyphicon-play-circle btn btn-sm' onClick='verify_action("+ nVerifyList+", \"model\")'></span></td>" +
+          "<td><span class='glyphicon glyphicon-pencil btn btn-sm'></span></td>" +
+          "<td><span class='glyphicon glyphicon-trash btn btn-sm' onClick='verify_delete("+ nVerifyList+")'></span></td></tr>");
+          nVerifyList++;
+          closeModal();
+        }
+      }
+    });
   }
-  nVerifyList++;
+
 }
 
-function verify_action_php(Command, classStatus, classTime){
+
+function verify_action_php(command, classStatus, classTime){
   'Method get to boton verify'
   // The Ajax invocation
 
   $.ajax({
     type: "GET",
-    data: { txt: Command },
+    data: { txt: command },
     url: 'php/verify-action.php',
     success: function (request) {
+      console.log(command);
       var request_array = request.split(';')
       var time = request_array[0]
       var bool_request = request_array[1]
@@ -86,6 +112,22 @@ function verify_action_php(Command, classStatus, classTime){
       $(classTime).html(time);
     }
   });
+}
+
+function formula_adjust(formula){
+  formula = formula.replace(/([a-z]\w*)/ig, " \'$1 ");      //add ' before process
+  formula = formula.replace('\'tt','tt');
+  formula = formula.replace('\'ff','ff');
+  formula = formula.replace('\'AND','AND');
+  formula = formula.replace('\'OR','OR');
+  formula = formula.replace('\'ANY','ANY');
+  return formula;
+}
+
+function get_command_ModelC(processModel, formula){
+  formula = formula_adjust(formula);
+  var maude = "red in SLML_MC : modelCheck({\'"+ processModel + "},("+ inputFromEdit.replace(/;/ig,',') + "), "+ formula +") .";
+  return maude;
 }
 
 function verify_action(n, func){
@@ -102,14 +144,9 @@ function verify_action(n, func){
   }else{
     processModel = $('.verify' + n).attr('processModel');
     formula = $('.verify' + n).attr('formula');
-    formula = formula.replace(/([a-z]\w*)/ig, " \'$1 ");      //add ' before process
-    formula = formula.replace('\'tt','tt')
-    formula = formula.replace('\'ff','ff')
-    formula = formula.replace('\'AND','AND')
-    formula = formula.replace('\'OR','OR')
-    formula = formula.replace('\'ANY','ANY')
-    var maude = "red in SLML_MC : modelCheck({\'"+ processModel + "},("+ inputFromEdit.replace(/;/ig,',') + "), "+ formula +") .";
+
     // verify_action_php(maude, '.test');
+    var maude = get_command_ModelC(processModel, formula);
     verify_action_php(maude, classStatus, classTime);
 
   }
