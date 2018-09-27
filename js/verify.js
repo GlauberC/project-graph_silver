@@ -1,10 +1,43 @@
-function addPropClick(){
-  $('.parse-model-check').hide()
-  $('.property-id').val('');
-  $('.formula-id').val('');
-  $(".radioProp").prop("checked", false)
-  $("div.prop-option").hide();
-  $("button.btn-prop-save").addClass('disabled');
+var choice //in property menu
+function addPropClick(n = null, type='default'){
+  if(type=='default'){
+    $('.btn-prop-edit').hide()
+    $('.btn-prop-save').show()
+    $(".radio").show();
+    $('.parse-model-check').hide();
+    $('.property-id').val('');
+    $('.formula-id').val('');
+    $(".radioProp").prop("checked", false)
+    $("div.prop-option").hide();
+    $("button.btn-prop-save").addClass('disabled');
+  }else{
+    $('.btn-prop-edit').show()
+    $('.btn-prop-save').hide()
+    $('.btn-prop-edit').attr('onClick', 'editbtn('+n+')');
+    if(type == 'model'){
+      $(".radio").hide();
+      $("#propBisim").hide();
+      $("#propMod").show();
+      choice = 1;
+      // TODO: Receive the process 1 and 2
+      // TODO: Receive the label
+
+    }else{
+      $(".radio").hide();
+      $("#propBisim").show();
+      $("#propMod").hide();
+      choice = 0;
+      // TODO: Receive the process
+      // TODO: Receive the formula
+    }
+
+  }
+
+}
+function editbtn(n){
+  // TODO: Receive data from n and change values
+  // TODO: Make parse model check like savebtn
+
 }
 function propBisimulation(){
   $("button.btn-prop-save").removeClass('disabled');
@@ -57,7 +90,7 @@ function savebtn(){
     "<td class = 'time"+nVerifyList+"'> <span class='glyphicon glyphicon-option-horizontal'></span> </td>" +
     "<td>"+ prop +"</td>" +
     "<td class = 'verify"+nVerifyList+"' process1 = '"+process1+"' process2 = '"+process2+"'><span class='glyphicon glyphicon-play-circle btn btn-sm' onClick='verify_action("+ nVerifyList+", \"bissi\")'></span></td>" +
-    "<td><span class='glyphicon glyphicon-pencil btn btn-sm'></span></td>" +
+    "<td><span class='glyphicon glyphicon-pencil btn btn-sm' data-toggle='modal' href='#property-modal' onClick='addPropClick("+ nVerifyList+", \"bissi\")'></span></td>" +
     "<td><span class='glyphicon glyphicon-trash btn btn-sm' onClick='verify_delete("+ nVerifyList+")'></span></td></tr>");
     nVerifyList++;
     closeModal();
@@ -73,14 +106,13 @@ function savebtn(){
       data: { txt: command },
       url: 'php/parse-model-check.php',
       success: function (request) {
-        console.log(request);
         if(request.includes("Prop:")){
           prop = $(".model-process-select").val() + "&nbsp;&nbsp;|=&nbsp;&nbsp;" + $(".formula-id").val();
           $('.verify-list').append("<tr class = 'element"+nVerifyList+"'><td class='status"+nVerifyList+"'> <span class='glyphicon glyphicon-option-horizontal'></span> </td>" +
           "<td class = 'time"+nVerifyList+"'> <span class='glyphicon glyphicon-option-horizontal'></span> </td>" +
           "<td>"+ prop +"</td>" +
           "<td class = 'verify"+nVerifyList+"' processModel = '"+processModel+"' formula = '"+formula+"'><span class='glyphicon glyphicon-play-circle btn btn-sm' onClick='verify_action("+ nVerifyList+", \"model\")'></span></td>" +
-          "<td><span class='glyphicon glyphicon-pencil btn btn-sm'></span></td>" +
+          "<td><span class='glyphicon glyphicon-pencil btn btn-sm' data-toggle='modal' href='#property-modal' onClick='addPropClick("+ nVerifyList+", \"model\")'></span></td>" +
           "<td><span class='glyphicon glyphicon-trash btn btn-sm' onClick='verify_delete("+ nVerifyList+")'></span></td></tr>");
           nVerifyList++;
           closeModal();
@@ -95,7 +127,6 @@ function savebtn(){
             error = request.match(re);
             error = error[0].replace('\'', '');
             error = error.replace(':', '')
-            console.log(error);
             $('.parse-model-check').html("<div class='alert alert-danger'><strong>Syntax Error: </strong> didn\'t expect "+ error +"</div>");
           }else{
             $('.parse-model-check').html("<div class='alert alert-danger'><strong>Error: </strong>Non valid expression</div>");
@@ -117,7 +148,6 @@ function verify_action_php(command, classStatus, classTime){
     data: { txt: command },
     url: 'php/verify-action.php',
     success: function (request) {
-      console.log(command);
       var request_array = request.split(';')
       var time = request_array[0]
       var bool_request = request_array[1]

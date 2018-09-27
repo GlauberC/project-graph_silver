@@ -1,7 +1,6 @@
 var inputFromEdit; //input
 var inputFromEditUnmanipulated; //raw input
 var colorBackup; //in graph
-var choice //in property menu
 var nVerifyList;
 
 
