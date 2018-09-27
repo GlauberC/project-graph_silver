@@ -73,11 +73,7 @@ function savebtn(){
       url: 'php/parse-model-check.php',
       success: function (request) {
         console.log(request);
-        if(request.includes("bad token")){
-          re = /bad\stoken.+/i;
-          error = request.match(re) ;
-          $('.parse-model-check').html("<div class='alert alert-danger'><strong>Syntax Error: </strong>"+ error +"</div>");
-        }else{
+        if(request.includes("Prop:")){
           prop = $(".model-process-select").val() + "&nbsp;&nbsp;|=&nbsp;&nbsp;" + $(".formula-id").val();
           $('.verify-list').append("<tr class = 'element"+nVerifyList+"'><td class='status"+nVerifyList+"'> <span class='glyphicon glyphicon-option-horizontal'></span> </td>" +
           "<td class = 'time"+nVerifyList+"'> <span class='glyphicon glyphicon-option-horizontal'></span> </td>" +
@@ -87,6 +83,19 @@ function savebtn(){
           "<td><span class='glyphicon glyphicon-trash btn btn-sm' onClick='verify_delete("+ nVerifyList+")'></span></td></tr>");
           nVerifyList++;
           closeModal();
+        }else{
+          if(request.includes("bad token")){
+            re = /bad\stoken.+/i;
+            error = request.match(re) ;
+            $('.parse-model-check').html("<div class='alert alert-danger'><strong>Syntax Error: </strong>"+ error +"</div>");
+          }else if (request.includes("didn't expect token")) {
+            re = /didn\'t\sexpect\stoken.+/i;
+            error = request.match(re) ;
+            console.log(error);
+            $('.parse-model-check').html("<div class='alert alert-danger'><strong>Syntax Error: </strong>"+ error +"</div>");
+          }else{
+            $('.parse-model-check').html("<div class='alert alert-danger'><strong>Error: </strong>Non valid expression</div>");
+          }
         }
       }
     });

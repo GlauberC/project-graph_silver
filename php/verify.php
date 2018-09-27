@@ -109,7 +109,7 @@ echo "
                          <button class = 'btn btn-default btn-sm' onClick='insert_on_formulaTXT(\"textareaid\", \" tt \")'>true</button>
                          <button class = 'btn btn-default btn-sm' onClick='insert_on_formulaTXT(\"textareaid\", \" ff \")'>false</button>
                          <button class = 'btn btn-default btn-sm' onClick='insert_on_formulaTXT(\"textareaid\", \" (  ) AND (  ) \")'>and</button>
-                         <button class = 'btn btn-default btn-sm' onClick='insert_on_formulaTXT(\"textareaid\", \" (  ) or (  ) \")'>or</button>
+                         <button class = 'btn btn-default btn-sm' onClick='insert_on_formulaTXT(\"textareaid\", \" (  ) OR (  ) \")'>or</button>
                          <button class = 'btn btn-default btn-sm' onClick='insert_on_formulaTXT(\"textareaid\", \" [[ ANY ]] (  ) \")'>necessity</button>
                          <button class = 'btn btn-default btn-sm' onClick='insert_on_formulaTXT(\"textareaid\", \" << ANY >> (  ) \")'>possibility</button>
                         </div>
