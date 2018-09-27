@@ -1,4 +1,5 @@
 function addPropClick(){
+  $('.parse-model-check').hide()
   $('.property-id').val('');
   $('.formula-id').val('');
   $(".radioProp").prop("checked", false)
@@ -84,15 +85,18 @@ function savebtn(){
           nVerifyList++;
           closeModal();
         }else{
+          $('.parse-model-check').show()
           if(request.includes("bad token")){
             re = /bad\stoken.+/i;
             error = request.match(re) ;
             $('.parse-model-check').html("<div class='alert alert-danger'><strong>Syntax Error: </strong>"+ error +"</div>");
           }else if (request.includes("didn't expect token")) {
-            re = /didn\'t\sexpect\stoken.+/i;
-            error = request.match(re) ;
+            re = /token.+/i;
+            error = request.match(re);
+            error = error[0].replace('\'', '');
+            error = error.replace(':', '')
             console.log(error);
-            $('.parse-model-check').html("<div class='alert alert-danger'><strong>Syntax Error: </strong>"+ error +"</div>");
+            $('.parse-model-check').html("<div class='alert alert-danger'><strong>Syntax Error: </strong> didn\'t expect "+ error +"</div>");
           }else{
             $('.parse-model-check').html("<div class='alert alert-danger'><strong>Error: </strong>Non valid expression</div>");
           }
