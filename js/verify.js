@@ -1,10 +1,10 @@
 var choice //in property menu
-function addPropClick(n = null, type='default'){
-  if(type=='default'){
+function addPropClick(n = null, typeProp='default'){
+  $('.parse-model-check').hide();
+  if(typeProp=='default'){
     $('.btn-prop-edit').hide()
     $('.btn-prop-save').show()
     $(".radio").show();
-    $('.parse-model-check').hide();
     $('.property-id').val('');
     $('.formula-id').val('');
     $(".radioProp").prop("checked", false)
@@ -13,31 +13,106 @@ function addPropClick(n = null, type='default'){
   }else{
     $('.btn-prop-edit').show()
     $('.btn-prop-save').hide()
-    $('.btn-prop-edit').attr('onClick', 'editbtn('+n+')');
-    if(type == 'model'){
+    $('.btn-prop-edit').attr('onClick', 'editbtn('+n+',\"'+typeProp+'\")');
+    if(typeProp == 'model'){
       $(".radio").hide();
       $("#propBisim").hide();
       $("#propMod").show();
       choice = 1;
-      // TODO: Receive the process 1 and 2
-      // TODO: Receive the label
+      var process_class = ".verify" + n;
+      var proc = $(process_class).attr('processmodel');
+      $('.model-process').val(proc);
+
+      var prop_class = ".property-formula"+ n;
+      var formula = $(prop_class).html();
+      formula = formula.replace(/&nbsp;/ig,"");
+      formula = formula.replace(/&lt;/ig, "<");
+      formula = formula.replace(/&gt;/ig, ">");
+      formula = formula.replace(/.+\|=/ig,"");
+      $('.formula-id').val(formula);
 
     }else{
       $(".radio").hide();
       $("#propBisim").show();
       $("#propMod").hide();
       choice = 0;
-      // TODO: Receive the process
-      // TODO: Receive the formula
+      $('verify')
+      var process_class = ".verify" + n;
+      var proc1 = $(process_class).attr('process1');
+      var proc2 = $(process_class).attr('process2');
+      $('#leftp').val(proc1);
+      $('#rightp').val(proc2);
+
+      var prop_class = ".property-label"+ n;
+      var prop = $(prop_class).html();
+      $('.property-id').val(prop);
+
     }
 
   }
 
 }
-function editbtn(n){
-  // TODO: Receive data from n and change values
-  // TODO: Make parse model check like savebtn
+function editbtn(n, typeProp){
+  var time_class = ".time" + n;
+  var status_class = ".status" + n;
+  var process_class = ".verify" + n;
 
+  if (typeProp == 'bissi'){
+    var proc1 = $('#leftp').val();
+    var proc2 = $('#rightp').val();
+    
+    $(process_class).attr("process1", proc1);
+    $(process_class).attr("process2", proc2);
+
+    var prop_class = ".property-label"+ n;
+    var prop_label = $('.property-id').val();
+    $(prop_class).html(prop_label);
+    $(status_class).html("<span class='glyphicon glyphicon-option-horizontal'></span>");
+    $(time_class).html("<span class='glyphicon glyphicon-option-horizontal'></span>");
+
+    closeModal();
+
+  }
+  else if(typeProp == 'model'){
+    var procModel = $('.model-process').val();
+    $(process_class).attr("processmodel", procModel);
+
+    var formula = $('.formula-id').val();
+    var command = "parse " + formula_adjust(formula) + " .";
+    var prop_class = ".property-formula"+ n;
+
+
+    $.ajax({
+      type: "GET",
+      data: { txt: command },
+      url: 'php/parse-model-check.php',
+      success: function (request) {
+        if(request.includes("Prop:")){
+          prop = $(".model-process-select").val() + "&nbsp;&nbsp;|=&nbsp;&nbsp;" + $(".formula-id").val();
+          $(status_class).html("<span class='glyphicon glyphicon-option-horizontal'></span>");
+          $(time_class).html("<span class='glyphicon glyphicon-option-horizontal'></span>");
+          $(prop_class).html(prop);
+          
+          closeModal();
+        }else{
+          $('.parse-model-check').show()
+          if(request.includes("bad token")){
+            re = /bad\stoken.+/i;
+            error = request.match(re) ;
+            $('.parse-model-check').html("<div class='alert alert-danger'><strong>Syntax Error: </strong>"+ error +"</div>");
+          }else if (request.includes("didn't expect token")) {
+            re = /token.+/i;
+            error = request.match(re);
+            error = error[0].replace('\'', '');
+            error = error.replace(':', '')
+            $('.parse-model-check').html("<div class='alert alert-danger'><strong>Syntax Error: </strong> didn\'t expect "+ error +"</div>");
+          }else{
+            $('.parse-model-check').html("<div class='alert alert-danger'><strong>Error: </strong>Non valid expression</div>");
+          }
+        }
+      }
+    });
+  }
 }
 function propBisimulation(){
   $("button.btn-prop-save").removeClass('disabled');
@@ -88,7 +163,7 @@ function savebtn(){
     prop = $(".property-id").val();
     $('.verify-list').append("<tr class = 'element"+nVerifyList+"'><td class='status"+nVerifyList+"'> <span class='glyphicon glyphicon-option-horizontal'></span> </td>" +
     "<td class = 'time"+nVerifyList+"'> <span class='glyphicon glyphicon-option-horizontal'></span> </td>" +
-    "<td>"+ prop +"</td>" +
+    "<td class = 'property-label"+nVerifyList+"'>"+ prop +"</td>" +
     "<td class = 'verify"+nVerifyList+"' process1 = '"+process1+"' process2 = '"+process2+"'><span class='glyphicon glyphicon-play-circle btn btn-sm' onClick='verify_action("+ nVerifyList+", \"bissi\")'></span></td>" +
     "<td><span class='glyphicon glyphicon-pencil btn btn-sm' data-toggle='modal' href='#property-modal' onClick='addPropClick("+ nVerifyList+", \"bissi\")'></span></td>" +
     "<td><span class='glyphicon glyphicon-trash btn btn-sm' onClick='verify_delete("+ nVerifyList+")'></span></td></tr>");
@@ -110,7 +185,7 @@ function savebtn(){
           prop = $(".model-process-select").val() + "&nbsp;&nbsp;|=&nbsp;&nbsp;" + $(".formula-id").val();
           $('.verify-list').append("<tr class = 'element"+nVerifyList+"'><td class='status"+nVerifyList+"'> <span class='glyphicon glyphicon-option-horizontal'></span> </td>" +
           "<td class = 'time"+nVerifyList+"'> <span class='glyphicon glyphicon-option-horizontal'></span> </td>" +
-          "<td>"+ prop +"</td>" +
+          "<td class = 'property-formula"+nVerifyList+"'>"+ prop +"</td>" +
           "<td class = 'verify"+nVerifyList+"' processModel = '"+processModel+"' formula = '"+formula+"'><span class='glyphicon glyphicon-play-circle btn btn-sm' onClick='verify_action("+ nVerifyList+", \"model\")'></span></td>" +
           "<td><span class='glyphicon glyphicon-pencil btn btn-sm' data-toggle='modal' href='#property-modal' onClick='addPropClick("+ nVerifyList+", \"model\")'></span></td>" +
           "<td><span class='glyphicon glyphicon-trash btn btn-sm' onClick='verify_delete("+ nVerifyList+")'></span></td></tr>");

@@ -4,8 +4,6 @@ echo "
             <div id='verify_list'>
               <nav>
                 <a class='btn btn-default' data-toggle='modal' href='#property-modal' onClick='addPropClick()'>Add Property</a>
-                <button class='btn btn-default pull-right'>Verify All</button>
-                <button class='btn btn-default pull-right disabled'>Stop</button>
               </nav>
               <div class='table'>
                 <table class='table-verify table'>
