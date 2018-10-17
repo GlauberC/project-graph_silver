@@ -69,7 +69,7 @@ function editbtn(n, typeProp){
     $(prop_class).html(prop_label);
     $(status_class).html("<span class='glyphicon glyphicon-option-horizontal'></span>");
     $(time_class).html("<span class='glyphicon glyphicon-option-horizontal'></span>");
-
+    get_verify_session();
     closeModal();
 
   }
@@ -92,7 +92,7 @@ function editbtn(n, typeProp){
           $(status_class).html("<span class='glyphicon glyphicon-option-horizontal'></span>");
           $(time_class).html("<span class='glyphicon glyphicon-option-horizontal'></span>");
           $(prop_class).html(prop);
-          
+          get_verify_session();
           closeModal();
         }else{
           $('.parse-model-check').show()
@@ -128,7 +128,7 @@ function propModel(){
 }
 
 function propertyPhp(){
-  nVerifyList = 0
+  
   getinputFromEdit();
   $("div.loaderParse").html("<div class='loader'></div>");
 
@@ -144,11 +144,25 @@ function propertyPhp(){
           // I used the content of create_graph.php to update the text "graph_txt"
           $("div#verifyPHP")[0].innerHTML = this.responseText;
       }
+      var property = $('.verify-list').html()
+      if(property == null){
+        nVerifyList = 0
+      }else{
+        $('.status-element').html("<span class='glyphicon glyphicon-option-horizontal'></span>");
+        $('.time-element').html("<span class='glyphicon glyphicon-option-horizontal'></span>");
+        var re = /element\d/ig;
+        var element_numbers = property.match(re);
+        if((element_numbers != null)){
+          nVerifyList = parseInt(element_numbers[element_numbers.length-1].replace('element', '')) + 1
+        }
+        
+      }
   };
   // Note that the URL is create_graph.php and I use "?txt" to send the needed parameter (the input from the user)
   xhttp.open("GET", "php/verify.php?txt=" + encodeURIComponent(txt), true);
   // Calling create_graph.php
   xhttp.send();
+  
 }
 function closeModal(){
   $('#property-modal').modal('toggle');
@@ -161,13 +175,14 @@ function savebtn(){
     var process1 = $('.bissim-process1').val();
     var process2 = $('.bissim-process2').val();
     prop = $(".property-id").val();
-    $('.verify-list').append("<tr class = 'element"+nVerifyList+"'><td class='status"+nVerifyList+"'> <span class='glyphicon glyphicon-option-horizontal'></span> </td>" +
-    "<td class = 'time"+nVerifyList+"'> <span class='glyphicon glyphicon-option-horizontal'></span> </td>" +
+    $('.verify-list').append("<tr class = 'element"+nVerifyList+"'><td class='status-element status"+nVerifyList+"'> <span class='glyphicon glyphicon-option-horizontal'></span> </td>" +
+    "<td class = 'time-element time"+nVerifyList+"'> <span class='glyphicon glyphicon-option-horizontal'></span> </td>" +
     "<td class = 'property-label"+nVerifyList+"'>"+ prop +"</td>" +
     "<td class = 'verify"+nVerifyList+"' process1 = '"+process1+"' process2 = '"+process2+"'><span class='glyphicon glyphicon-play-circle btn btn-sm' onClick='verify_action("+ nVerifyList+", \"bissi\")'></span></td>" +
     "<td><span class='glyphicon glyphicon-pencil btn btn-sm' data-toggle='modal' href='#property-modal' onClick='addPropClick("+ nVerifyList+", \"bissi\")'></span></td>" +
     "<td><span class='glyphicon glyphicon-trash btn btn-sm' onClick='verify_delete("+ nVerifyList+")'></span></td></tr>");
     nVerifyList++;
+    get_verify_session();
     closeModal();
   }else if(choice == 1){
     var processModel = $('.model-process').val();
@@ -183,13 +198,14 @@ function savebtn(){
       success: function (request) {
         if(request.includes("Prop:")){
           prop = $(".model-process-select").val() + "&nbsp;&nbsp;|=&nbsp;&nbsp;" + $(".formula-id").val();
-          $('.verify-list').append("<tr class = 'element"+nVerifyList+"'><td class='status"+nVerifyList+"'> <span class='glyphicon glyphicon-option-horizontal'></span> </td>" +
-          "<td class = 'time"+nVerifyList+"'> <span class='glyphicon glyphicon-option-horizontal'></span> </td>" +
+          $('.verify-list').append("<tr class = 'element"+nVerifyList+"'><td class='status-element status"+nVerifyList+"'> <span class='glyphicon glyphicon-option-horizontal'></span> </td>" +
+          "<td class = 'time-element time"+nVerifyList+"'> <span class='glyphicon glyphicon-option-horizontal'></span> </td>" +
           "<td class = 'property-formula"+nVerifyList+"'>"+ prop +"</td>" +
           "<td class = 'verify"+nVerifyList+"' processModel = '"+processModel+"' formula = '"+formula+"'><span class='glyphicon glyphicon-play-circle btn btn-sm' onClick='verify_action("+ nVerifyList+", \"model\")'></span></td>" +
           "<td><span class='glyphicon glyphicon-pencil btn btn-sm' data-toggle='modal' href='#property-modal' onClick='addPropClick("+ nVerifyList+", \"model\")'></span></td>" +
           "<td><span class='glyphicon glyphicon-trash btn btn-sm' onClick='verify_delete("+ nVerifyList+")'></span></td></tr>");
           nVerifyList++;
+          get_verify_session();
           closeModal();
         }else{
           $('.parse-model-check').show()
@@ -229,6 +245,14 @@ function verify_action_php(command, classStatus, classTime){
       $(classStatus).html(bool_request);
       $(classTime).html(time);
     }
+  });
+}
+function get_verify_session(){
+  var properties = $('.verify-list').html();
+  $.ajax({
+    type: "GET",
+    data: { txt: properties },
+    url: 'php/verify-property-session.php'
   });
 }
 
@@ -273,6 +297,7 @@ function verify_action(n, func){
 function verify_delete(n){
   element_class = ".element" +n;
   $(element_class).remove();
+  get_verify_session();
 }
 
 

@@ -1,4 +1,5 @@
 <?php
+session_start();
 require_once ("input.php");
 echo "
             <div id='verify_list'>
@@ -15,9 +16,15 @@ echo "
                     <th>Edit</th>
                     <th>Delete</th>
                   </thead>
-                  <tbody class='verify-list'>
-                  </tbody>
-                </table>
+                  <tbody class='verify-list'>";
+                  if($_SESSION['properties'] == ""){
+                    echo "</tbody>";
+                  }else{
+                    echo $_SESSION['properties'];
+                    echo "</tbody>";
+                  }
+                  
+                echo "</table>
               </div>
 
             </div>
