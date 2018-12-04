@@ -9,7 +9,7 @@ $DIR_MAUDE = exec('which maude');  //<- YOU MUST CHANGE HERE
 $DIR_FILE_MAUDE = "../system/modelchecking.maude";
 $MODF = "-no-banner";
 $COMMAND = escapeshellarg($COMMAND);
-$result =  shell_exec("echo $COMMAND | $DIR_MAUDE $DIR_FILE_MAUDE $MODF 2>&1 ");
+$result =  shell_exec("timeout 30 sh -c \"echo  $COMMAND | $DIR_MAUDE $DIR_FILE_MAUDE $MODF 2>&1 \"");
 //It runs the SiLVer on Maude from maude-silver-run.php File
 if (preg_match("/BISIMULATION/i" , $COMMAND)){
   // echo "<br><br>Saida:<br>" . $result;

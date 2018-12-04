@@ -8,7 +8,7 @@ $MODF = "-no-banner";
 $input = $_GET["txt"];
 $COMMAND = $input;
 $COMMAND = escapeshellarg($COMMAND);
-$result =  shell_exec("echo $COMMAND | $DIR_MAUDE $DIR_FILE_MAUDE $MODF 2>&1 ");
+$result =  shell_exec("timeout 30 sh -c \"echo $COMMAND | $DIR_MAUDE $DIR_FILE_MAUDE $MODF 2>&1 \"");
 echo $result;
 
 

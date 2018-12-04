@@ -14,7 +14,7 @@ for ($i = 0; $i<count($array_input);$i++){
     $process = substr($array_input[$i], 0, $equal);
     $COMMAND = "parse generateDot( { ". $process ." } , " . $array_input[$i] . " ) . " ;
     $COMMAND = escapeshellarg($COMMAND);
-    $result =  shell_exec("echo $COMMAND | $DIR_MAUDE $DIR_FILE_MAUDE $MODF 2>&1 ");
+    $result =  shell_exec("timeout 30 sh -c \"echo  $COMMAND | $DIR_MAUDE $DIR_FILE_MAUDE $MODF 2>&1 \"");
     $line++;
     if(preg_match("/Warning/i" , $result)){
         echo "line $line " . $result . "<br>";
